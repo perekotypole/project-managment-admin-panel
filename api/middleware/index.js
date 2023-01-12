@@ -49,7 +49,7 @@ export const verifyUser = async (req, res, next) => {
 }
 
 export const pageAccess = async (req, res, next) => {
-  if (req.originalUrl == '/'
+  if (req.originalUrl === '/'
     || req.originalUrl === '/login'
     || req.originalUrl === '/favicon.ico') return next()
 
@@ -62,8 +62,8 @@ export const pageAccess = async (req, res, next) => {
   }
 
   const user = await User.findById(userID)
-  const role = await Role.findById(user.roleID)
-  const access = await Content.find({ _id: { $in: role?.content || [] }})
+  const contentIDs = await Role.find({ _id: { $in: user.rolesID } }).distinct('content')
+  const access = await Content.find({ _id: { $in: contentIDs || [] }})
 
   const slug = req.originalUrl.split('/')[1]
   if (!access.map(({ slug }) => slug).includes(slug)) {
@@ -71,7 +71,7 @@ export const pageAccess = async (req, res, next) => {
     return
   }
 
-  req.accessIDs = user.access
+  req.accessIDs = contentIDs
   req.access = access
 
   return next()
@@ -79,11 +79,13 @@ export const pageAccess = async (req, res, next) => {
 
 export const dataAccess = async (req, res, next) => {
   const { userID } = req.user
-  const user = await User.findById(userID)
-  const role = await Role.findById(user.roleID)
-  const access = await Content.find({ _id: { $in: [...role?.content, ...role?.blocks] }})
 
-  req.accessIDs = [...role?.content, ...role?.blocks]
+  const user = await User.findById(userID)
+  const contentIDs = await Role.find({ _id: { $in: user.rolesID } }).distinct('content')
+  const blocksIDs = await Role.find({ _id: { $in: user.rolesID } }).distinct('blocks')
+  const access = await Content.find({ _id: { $in: [...contentIDs, ...blocksIDs] }})
+
+  req.accessIDs = [...contentIDs, ...blocksIDs]
   req.access = access
 
   return next()

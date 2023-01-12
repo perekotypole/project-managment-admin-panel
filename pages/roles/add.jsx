@@ -1,23 +1,22 @@
-import { Autorenew, Save as SaveIcon } from '@mui/icons-material';
-import { Box, Button, Chip, Divider, FormControl,
-  Grid, IconButton, InputLabel,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  MenuItem, OutlinedInput, Paper, TextField, Typography
-} from '@mui/material';
-
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
+
+import { Save as SaveIcon } from '@mui/icons-material';
+import { Box, Button, Chip, Divider,
+  Grid,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  Paper, TextField, Typography
+} from '@mui/material';
+
 import Layout from '../../components/Layout';
 import Modal from '../../components/Modal';
 import Role from '../../components/Role';
 import ColorPicker from '../../components/ColorPicker';
-import { generateToken } from '../../tools/functions';
-import { Stack } from '@mui/system';
 
 const AddRole = () => {
   const router = useRouter()
@@ -55,7 +54,7 @@ const AddRole = () => {
     : projectsList
   , [projectsList, filterProjects])
 
-  const fetchProjects = async () => {
+  const fetchData = async () => {
     const { data: result } = await axios.post('/api/roles/getAllContent')
     if (!result.success) return
 
@@ -66,7 +65,10 @@ const AddRole = () => {
   }
 
   useEffect(() => {
-    if (!projectsList.length) fetchProjects()
+    if (!projectsList.length
+      || pagesList.length
+      || blocksList.length
+    ) fetchData()
   }, []);
 
   const checkData = (data) => {
@@ -93,6 +95,7 @@ const AddRole = () => {
     })
     handleOpen()
   }
+  
   const onSubmit = async () => {
     const { data: result } = await axios.post('/api/roles/create', formData)
     if (!result.success) return handleClose()

@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { Content, Project, Role } from './models/index.js'
+import { Content, Project, Role, User } from './models/index.js'
 import { dataAccess } from './middleware/index.js'
 
 const router = Router()
@@ -111,10 +111,10 @@ router.post('/edit', dataAccess, async (req, res) => {
       return
     }
 
-    const { id, projectData } = req.body
+    const { id, roleData } = req.body
     if (!id) return res.json({ error: 'Project ID is required' })
   
-    await Project.findByIdAndUpdate(id, projectData)
+    await Role.findByIdAndUpdate(id, roleData)
 
     return res.json({ 
       success: true,
@@ -141,15 +141,15 @@ router.post('/remove', dataAccess, async (req, res) => {
       return
     }
   
-    await Error.findOneAndDelete({ projectID: id })
-    await Project.findByIdAndDelete(id)
+    await User.updateMany({ rolesID: id }, { $pull: { rolesID: id } })
+    await Role.findByIdAndDelete(id)
   
     return res.json({ 
       success: true,
     })
     
   } catch (error) {
-    console.error('/checker/remove => ', error)
+    console.error('/roles/remove => ', error)
     return res.json({ error })
   }
 })

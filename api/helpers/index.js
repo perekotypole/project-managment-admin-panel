@@ -46,7 +46,7 @@ export const checkInitData = async () => {
   if (!admin) {
     await User.create({
       ...initData.admin,
-      roleID: adminRole._id
+      roleID: [adminRole._id]
     })
   }
 }

@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 export const User = mongoose.model('User', {
   username: { type: String },
   token: { type: String, unique: true },
-  roleID: { type: mongoose.Types.ObjectId },
+  rolesID: [{ type: mongoose.Types.ObjectId }],
   createdAt: { type: Date, default: () => new Date() },
 });
 

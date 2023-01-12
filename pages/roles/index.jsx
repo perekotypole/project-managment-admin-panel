@@ -69,10 +69,12 @@ const RolesPage = () => {
       return
     }
 
-    // await axios.post('/api/projects/remove', { id: elemOnRemove.id })
+    await axios.post('/api/roles/remove', { id: elemOnRemove._id })
     fetchRoles()
+
     setRoleDetails(null)
     setSelectedRole(null)
+
     handleModalClose()
   }
 
@@ -150,7 +152,7 @@ const RolesPage = () => {
 
             <Stack direction='row' spacing={1} sx={{ my: 1 }}>
               {roleDetails.blocks.map(el =>
-                <Chip label={el.title} variant="outlined" />
+                <Chip key={el._id} label={el.title} variant="outlined" />
               )}
             </Stack>
           </Box> }
@@ -160,7 +162,7 @@ const RolesPage = () => {
 
             <Stack direction='row' spacing={1} sx={{ my: 1 }}>
               {roleDetails.content.map(el => 
-                <Link href={el.link} sx={{ cursor: 'pointer' }}>
+                <Link key={el._id} href={el.link} sx={{ cursor: 'pointer' }}>
                   <Chip label={el.title} variant="outlined" />
                 </Link>
               )}
@@ -172,7 +174,7 @@ const RolesPage = () => {
 
             <Stack direction='row' spacing={1} sx={{ my: 1 }}>
               {roleDetails.access.map(el =>
-                <Chip label={el.name} variant="outlined" />
+                <Chip key={el._id} label={el.name} variant="outlined" />
               )}
             </Stack>
           </Box> }
