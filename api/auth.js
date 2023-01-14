@@ -7,15 +7,26 @@ const router = Router()
 
 router.post('/login', async (req, res) => {
   try {
-    const { token } = req.body
+    const { login, password } = req.body
   
-    if (!token) return res.json({ 
-      error: 'Token is required'
+    const error = {}
+    if (!login) error.login = 'Login is required'
+    if (!password) error.password = 'Login is required'
+
+    if (Object.keys(error).length) return res.json(error)
+  
+    const userExists = await User.findOne({ login })
+    if (!userExists) return res.json({
+      error: {
+        login: 'The user is not registered'
+      }
     })
   
-    const userExists = await User.findOne({ token })
-    if (!userExists) return res.json({ 
-      error: 'The token is not registered'
+    const passwordCheck = await User.findOne({ login, password })
+    if (!passwordCheck) return res.json({ 
+      error: {
+        password: 'Password is not valid'
+      }
     })
   
     const additionalData = {
@@ -25,9 +36,8 @@ router.post('/login', async (req, res) => {
       acceptLanguage: req.headers['accept-language'],
     }
   
-    // req.session.tokens = null
     req.session.tokens = await generateToken(req.sessionID, userExists._id, additionalData)
-    // process.exit()
+
     return res.json({ 
       success: true,
     })

@@ -1,44 +1,40 @@
 import * as dotenv from 'dotenv'
 dotenv.config()
 
-export const defaultContent = [
+export const contentBlocks = [
   {
     title: 'Resources monitoring',
     slug: 'resources',
-    type: 'block'
   },
+]
+
+export const contentPage = [
   // {
   //   title: 'Users',
   //   slug: 'users',
-  //   link: '/users',
-  //   type: 'page'
   // },
   {
     title: 'Roles',
     slug: 'roles',
-    link: '/roles',
-    type: 'page'
   },
   {
     title: 'Projects',
     slug: 'projects',
-    link: '/projects',
-    type: 'page'
   },
   {
     title: 'Errors manager',
     slug: 'errors',
-    link: '/errors',
-    type: 'page'
   },
 ]
 
 export const admin = {
   username: 'admin',
-  token: process.env.INIT_TOKEN || 'token',
+  login: process.env.ADMIN_LOGIN || 'admin',
+  password: process.env.INIT_PASS || 'password',
 }
 
 export default {
-  defaultContent,
+  contentBlocks,
+  contentPage,
   admin,
 }

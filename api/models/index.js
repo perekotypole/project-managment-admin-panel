@@ -2,7 +2,8 @@ import mongoose from 'mongoose'
 
 export const User = mongoose.model('User', {
   username: { type: String },
-  token: { type: String, unique: true },
+  login: { type: String, unique: true },
+  password: { type: String },
   rolesID: [{ type: mongoose.Types.ObjectId }],
   createdAt: { type: Date, default: () => new Date() },
 });

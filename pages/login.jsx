@@ -2,31 +2,28 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 
-import LoginLayout from '../components/LoginLayout';
-import { TextField, Button, Box } from '@mui/material';
-import styled from '@emotion/styled'
 import axios from 'axios';
+import { TextField, Button, Box } from '@mui/material';
+import LoginLayout from '../components/LoginLayout';
 
 const Login = () => {
   const router = useRouter();
-  const [error, setError] = useState(null);
+  const [error, setError] = useState({});
   const { register, handleSubmit, formState } = useForm({});
 
-  const From = styled.form`
-    display: flex;
-    gap: 1em;
-    align-items: start;
-  `
-
-  const onSubmit = async ({ token }) => {
-    if (!token) return setError('Token is required')
+  const onSubmit = async ({ login, password }) => {
+    if (!login || !password) return setError({
+      login: !login ? 'Login is required' : null,
+      password: !password ? 'Password is required' : null,
+    })
     
-    setError(null)
+    setError({})
 
-    const { data: result } = await axios.post('/api/auth/login', { token })
+    const { data: result } = await axios.post('/api/auth/login', { login, password })
+    console.log(await axios.post('/api/auth/login', { login, password }));
     if (result?.success) return router.push('/');
 
-    return setError(result?.error || 'Unknown error')
+    return setError(result?.error || { global: 'Unknown error' })
   }
 
   return <LoginLayout>
@@ -39,20 +36,43 @@ const Login = () => {
         alignItems: 'center',
       }}
     >
-      <From onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)}
+        style={{
+          display: 'flex',
+          gap: '1em',
+          flexDirection: 'column',
+          width: '95%',
+          maxWidth: '350px',
+        }}
+      >
+        <span style={{ color: 'var(--color-red)' }}>{error.global}</span>
+
         <TextField
-          required
-          label="Token"
-          name='token'
+          required fullWidth
+          label="Login"
+          name='login'
           type='text'
           variant="standard"
-          {...register('token')}
+          {...register('login')}
 
-          error={!!error}
-          helperText={error}
+          error={!!error.login}
+          helperText={error.login}
+        ></TextField>
+
+        <TextField
+          required fullWidth
+          label="Password"
+          name='password'
+          type='password'
+          variant="standard"
+          {...register('password')}
+
+          error={!!error.password}
+          helperText={error.password}
         ></TextField>
 
         <Button
+          fullWidth
           disabled={formState.isSubmitting}
           type="submit"
           variant="outlined"
@@ -61,7 +81,7 @@ const Login = () => {
         >
           Login
         </Button>
-      </From>
+      </form>
     </Box>
   </LoginLayout>
 }

@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { Box, TextField } from "@material-ui/core";
 import { HexColorInput, HexColorPicker } from "react-colorful";
-import { Paper } from "@mui/material";
+import { Paper, Box, TextField  } from "@mui/material";
 
 const ColorPicker = ({ color, setColor }) => {
   const [open, setOpen] = useState(false);
