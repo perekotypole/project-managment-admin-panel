@@ -11,8 +11,12 @@ const defContent = [
   ...initData?.contentBlocks
 ]
 
-export const database = mongoose
-  .connect(`mongodb://localhost/${process.env.DATABASE || 'adminpanel'}`, {
+const initLogin = process.env.ADMIN_LOGIN || 'admin'
+const secret = process.env.SECRET || 'secret'
+const tokenTime = process.env.TOKENTIME || 20
+
+export const database = (url) => mongoose
+  .connect(url, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -47,13 +51,13 @@ export const checkInitData = async () => {
   if (!role) role = await Role.create({ name: 'admin', ...contentForRole })
   else await Role.findByIdAndUpdate(role._id, contentForRole)
 
-  const admin = await User.findOne({ login: process.env.ADMIN_LOGIN })
+  const admin = await User.findOne({ login: initLogin })
   if (!admin) await User.create({
     ...initData.admin,
     rolesID: [role._id]
   })
   else User.findOneAndUpdate({
-    login: process.env.ADMIN_LOGIN,
+    login: initLogin,
     rolesID: { $ne: role._id }
   }, { $push: { rolesID: role._id } })
 }
@@ -76,8 +80,8 @@ export const generateToken = async (sessionID, userID, additionalData) => {
 
   const accessToken = await jwt.sign({
     userID,
-  }, process.env.SECRET || 'secret', {
-    expiresIn: `${process.env.TOKENTIME || 20}m`,
+  }, secret, {
+    expiresIn: `${tokenTime}m`,
   })
 
   return {

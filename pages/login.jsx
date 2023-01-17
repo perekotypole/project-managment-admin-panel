@@ -20,7 +20,6 @@ const Login = () => {
     setError({})
 
     const { data: result } = await axios.post('/api/auth/login', { login, password })
-    console.log(await axios.post('/api/auth/login', { login, password }));
     if (result?.success) return router.push('/');
 
     return setError(result?.error || { global: 'Unknown error' })

@@ -18,7 +18,10 @@ const port = process.env.PORT || 7070
 const app = next({ dev, hostname, port })
 const handle = app.getRequestHandler()
 
-database
+const secret = process.env.SECRET || 'secret'
+const DBUrl = `mongodb://localhost/${process.env.DATABASE || 'adminpanel'}`
+
+database(DBUrl)
   .then(async () => {
     console.log('Database is connected')
     await checkInitData()
@@ -33,11 +36,11 @@ app.prepare()
   const server = express()
   
   server.use(session({
-    secret: process.env.SECRET || 'secret',
+    secret,
     resave: false,
     saveUninitialized: true,
     store: MongoStore.create({
-      mongoUrl: `mongodb://localhost/${process.env.DATABASE || 'adminpanel'}`
+      mongoUrl: DBUrl
     })
   }))
 

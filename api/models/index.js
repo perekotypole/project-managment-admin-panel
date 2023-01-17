@@ -5,6 +5,8 @@ export const User = mongoose.model('User', {
   login: { type: String, unique: true },
   password: { type: String },
   rolesID: [{ type: mongoose.Types.ObjectId }],
+  startedProject: { type: mongoose.Types.ObjectId },
+  accessStatus: { type: String },
   createdAt: { type: Date, default: () => new Date() },
 });
 

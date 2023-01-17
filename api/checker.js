@@ -25,11 +25,27 @@ const setTimeoutForWaiting = (project) => setTimeout(() => {
   })
 }, reserveTime + project.reloadTime * 1000)
 
-const setTimeoutForRequest = async ({ _id }) => {
-  const project = await Project.findById(_id)
+const setTimeoutForRequest = async ({ _id, token }) => {
+  if (!_id || !token) return makingRequests[token] = null
 
   try {
-    await axios.get(project.requestLink)
+    const project = await Project.findById(_id)
+    if (!project) return makingRequests[token] = null
+
+    try {
+      await axios.get(project.requestLink)
+    } catch (error) {
+      if (project.status !== false) {
+        setBadStatus(project._id)
+        sendMessage({
+          token: project.telegram?.token,
+          chatID: project.telegram?.chat,
+          message: `🆘 [ ${project.name || 'Unknown project'} ]: Connection check timed out` ,
+        })
+      }
+
+      return
+    }
 
     if (project.status === false) {
       sendMessage({
@@ -40,20 +56,14 @@ const setTimeoutForRequest = async ({ _id }) => {
     }
 
     setGoodStatus(project._id)
-  } catch (error) {
-    if (project.status !== false) {
-      setBadStatus(project._id)
-      sendMessage({
-        token: project.telegram?.token,
-        chatID: project.telegram?.chat,
-        message: `🆘 [ ${project.name || 'Unknown project'} ]: Connection check timed out` ,
-      })
-    }
-  }
 
-  return setTimeout(() => {
-    setTimeoutForRequest(project)
-  }, project.reloadTime * 1000);
+    return setTimeout(() => {
+      setTimeoutForRequest(project)
+    }, project.reloadTime * 1000);
+
+  } catch (error) {
+    setTimeoutForRequest({ _id, token })
+  }
 }
 
 export const checkerAddProject = (project) => {

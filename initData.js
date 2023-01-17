@@ -9,10 +9,10 @@ export const contentBlocks = [
 ]
 
 export const contentPage = [
-  // {
-  //   title: 'Users',
-  //   slug: 'users',
-  // },
+  {
+    title: 'Users',
+    slug: 'users',
+  },
   {
     title: 'Roles',
     slug: 'roles',

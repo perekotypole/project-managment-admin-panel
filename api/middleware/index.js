@@ -1,6 +1,11 @@
+import * as dotenv from 'dotenv'
+dotenv.config()
+
 import jwt from 'jsonwebtoken'
 import { refresh } from '../helpers/index.js'
 import { User, Content, Role } from '../models/index.js'
+
+const secret = process.env.SECRET || 'secret'
 
 export const verifyUser = async (req, res, next) => {
   // return next()
@@ -17,7 +22,6 @@ export const verifyUser = async (req, res, next) => {
     return
   }
 
-  const secret = process.env.SECRET || 'secret'
   const accessToken = tokens.access
   const refreshToken = tokens.refresh
 
