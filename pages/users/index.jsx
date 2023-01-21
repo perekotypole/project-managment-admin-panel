@@ -88,7 +88,7 @@ const UsersPage = () => {
   }
 
   const comfirmRemove = async () => {
-    if (elemOnRemove.name !== nameForRemoval) {
+    if (elemOnRemove.username !== nameForRemoval) {
       setRemovalRole('Values don`t match')
       return
     }
@@ -310,7 +310,7 @@ const UsersPage = () => {
       onCancel={handleModalClose}
       onSubmit={() => comfirmRemove()}
     >
-      <div>Enter <b>{elemOnRemove?.name}</b> for comfirm removal?</div>
+      <div>Enter <b>{elemOnRemove?.username}</b> for comfirm removal?</div>
 
       <TextField
         fullWidth

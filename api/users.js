@@ -152,9 +152,11 @@ router.post('/remove', dataAccess, async (req, res) => {
       res.json({ error: 'ID is required' })
       return
     }
+
+    const user = await User.findById(id)
+    if (user?.baseUser) return res.json({ error: 'Unable to remove base user' })
   
-    await User.updateMany({ rolesID: id }, { $pull: { rolesID: id } })
-    await Role.findByIdAndDelete(id)
+    await user.deleteOne()
   
     return res.json({ 
       success: true,
