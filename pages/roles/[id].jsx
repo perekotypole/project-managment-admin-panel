@@ -38,6 +38,7 @@ const EditRole = () => {
   >{children}</TextField>
 
   const [formData, setFormData] = useState({})
+  const [base, setBase] = useState(false)
   const [roleName, setRoleName] = useState('');
   const [color, setColor] = useState("#000000");
   const [formErrors, setFormErrors] = useState({})
@@ -63,6 +64,7 @@ const EditRole = () => {
 
     const { role } = result
 
+    setBase(role.baseRole)
     setFormData({
       name: role.name,
       color: role.color,
@@ -109,7 +111,6 @@ const EditRole = () => {
   }
 
   const onSubmit = async () => {
-    // console.log(formData);
     const { data: result } = await axios.post('/api/roles/edit', { id, roleData: formData })
     if (!result.success) return handleClose()
 
@@ -195,6 +196,7 @@ const EditRole = () => {
                           key={el._id}
                           label={el.title}
                           color={'primary'}
+                          disabled={base}
                           variant={selectedBlocks.includes(el._id) ? "filled" : "outlined"}
                           onClick={() => {
                             if (selectedBlocks.includes(el._id)) {
@@ -222,6 +224,7 @@ const EditRole = () => {
                           key={el._id}
                           label={el.title}
                           color={'primary'}
+                          disabled={base}
                           variant={selectedPages.includes(el._id) ? "filled" : "outlined"}
                           onClick={() => {
                             if (selectedPages.includes(el._id)) {

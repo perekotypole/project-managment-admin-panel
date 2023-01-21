@@ -22,7 +22,7 @@ router.post('/', dataAccess, async (req, res) => {
 
     return res.json({ 
       success: true,
-      usersList: list
+      usersList: list.sort(doc1 => !doc1.baseUser ? -1 : null)
     })
     
   } catch (error) {
@@ -95,31 +95,6 @@ router.post('/updateSelectedData', dataAccess, async (req, res) => {
   }
 })
 
-router.post('/getAllContent', dataAccess, async (req, res) => {
-  try {
-    const access = req.access.map(({slug}) => slug).includes(accessSlug)
-    if (!access) {
-      res.redirect('/')
-      return
-    }
-  
-    const pages = await Content.find({ type: 'page'}).select('_id title')
-    const blocks = await Content.find({ type: 'block'}).select('_id title')
-    const projects = await Project.find({}).sort('-createdAt').select('_id name')
-  
-    return res.json({ 
-      success: true,
-      pages,
-      blocks,
-      projects
-    })
-    
-  } catch (error) {
-    console.error('/users/getAllContent => ', error)
-    return res.json({ error })
-  }
-})
-
 router.post('/create', dataAccess, async (req, res) => {
   try {
     const access = req.access.map(({slug}) => slug).includes(accessSlug)
@@ -128,14 +103,14 @@ router.post('/create', dataAccess, async (req, res) => {
       return
     } 
   
-    await Role.create(req.body)
+    await User.create(req.body)
   
     return res.json({ 
       success: true,
     })
     
   } catch (error) {
-    console.error('/role/create => ', error)
+    console.error('/users/create => ', error)
     return res.json({ error })
   }
 })
@@ -148,17 +123,17 @@ router.post('/edit', dataAccess, async (req, res) => {
       return
     }
 
-    const { id, roleData } = req.body
-    if (!id) return res.json({ error: 'Project ID is required' })
+    const { id, userData } = req.body
+    if (!id) return res.json({ error: 'User ID is required' })
   
-    await Role.findByIdAndUpdate(id, roleData)
+    await User.findByIdAndUpdate(id, userData)
 
     return res.json({ 
       success: true,
     })
     
   } catch (error) {
-    console.error('/projects/edit => ', error)
+    console.error('/users/edit => ', error)
     return res.json({ error })
   }
 })

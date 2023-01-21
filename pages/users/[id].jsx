@@ -3,22 +3,25 @@ import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { Save as SaveIcon } from '@mui/icons-material';
-import { Box, Button, Chip, Divider,
+import { Autorenew, Save as SaveIcon } from '@mui/icons-material';
+import {
+  Avatar, Box, Button, Divider,
+  FormControl,
   Grid,
+  InputLabel,
   List,
   ListItem,
   ListItemButton,
-  ListItemText,
-  Paper, TextField, Typography
+  Paper, TextField, Typography, Stack, OutlinedInput, IconButton
 } from '@mui/material';
+
+import { generateToken } from '../../tools/functions';
 
 import Layout from '../../components/Layout';
 import Modal from '../../components/Modal';
 import Role from '../../components/Role';
-import ColorPicker from '../../components/ColorPicker';
 
-const EditRole = () => {
+const EditUser = () => {
   const router = useRouter()
   const { id } = router.query
 
@@ -38,79 +41,70 @@ const EditRole = () => {
   >{children}</TextField>
 
   const [formData, setFormData] = useState({})
-  const [roleName, setRoleName] = useState('');
-  const [color, setColor] = useState("#000000");
+  const [base, setBase] = useState(false)
+  const [password, setPassword] = useState('')
   const [formErrors, setFormErrors] = useState({})
 
-  const [projectsList, setProjectsList] = useState([]);
-  const [selectedProjects, setSelectedProjects] = useState([]);
-  const [pagesList, setPagesList] = useState([]);
-  const [selectedPages, setSelectedPages] = useState([]);
-  const [blocksList, setBlocksList] = useState([]);
-  const [selectedBlocks, setSelectedBlocks] = useState([]);
+  const [rolesList, setRolesList] = useState([]);
+  const [selectedRoles, setSelectedRoles] = useState([]);
 
-  const [filterProjects, setFilter] = useState();
-
-  const filterProjectsList = useMemo(() => filterProjects
-    ? projectsList.filter(({ name }) =>
-      name.toLowerCase().indexOf(filterProjects.toLowerCase()) !== -1)
-    : projectsList
-  , [projectsList, filterProjects])
+  const [filterRoles, setFilterRoles] = useState();
+  const filterRolesList = useMemo(() => filterRoles
+    ? rolesList.filter(({ name }) => name.toLowerCase().indexOf(filterRoles.toLowerCase()) !== -1)
+    : rolesList
+    , [rolesList, filterRoles])
 
   const fetchData = async () => {
-    const { data: result } = await axios.post('/api/roles/getOne', { id })
+    const { data: result } = await axios.post('/api/users/getOne', { id })
     if (!result.success) return
 
-    const { role } = result
+    const { user } = result
 
+    setBase(user.baseUser)
     setFormData({
-      name: role.name,
-      color: role.color,
-      description: role.description,
-      blocks: role.blocks.map(el => el._id),
-      content: role.content.map(el => el._id),
-      access: role.access.map(el => el._id),
+      username: user.username,
+      login: user.login,
+      password: user.password,
+      description: user.description,
+      rolesID: user.rolesID.map(el => el._id),
     })
   }
 
-  const fetchLists = async () => {
-    const { data: result } = await axios.post('/api/roles/getAllContent')
+  const fetchRoles = async () => {
+    const { data: result } = await axios.post('/api/roles')
     if (!result.success) return
 
-    const { projects, blocks, pages } = result
-    setProjectsList(projects)
-    setPagesList(pages)
-    setBlocksList(blocks)
+    const { rolesList } = result
+    setRolesList(rolesList)
   }
 
   const checkData = (data) => {
     const errors = {}
     setFormErrors(errors)
 
-    data.name = roleName
-    data.color = color
+    data.password = password
 
-    if (!data.name) errors.name = 'Role name is required'
+    if (!data.username) errors.username = 'Userame is required'
+    if (!data.login) errors.login = 'Login is required'
+    if (!data.password) data.password = setPassword(generateToken(12))
 
-    if (Object.keys(errors).length){
+    if (Object.keys(errors).length) {
       setFormErrors(errors)
       return
     }
 
     setFormData({
-      name: data.name,
-      color: data.color,
+      username: data.username,
       description: data.description,
-      blocks: selectedBlocks,
-      content: selectedPages,
-      access: selectedProjects,
+      login: data.login,
+      password: password,
+      rolesID: selectedRoles,
     })
     handleOpen()
   }
 
   const onSubmit = async () => {
-    // console.log(formData);
-    const { data: result } = await axios.post('/api/roles/edit', { id, roleData: formData })
+    const { data: result } = await axios.post('/api/users/edit', { id, userData: formData })
     if (!result.success) return handleClose()
 
     router.back()
@@ -118,7 +112,7 @@ const EditRole = () => {
 
   useEffect(() => {
     if (id) {
-      fetchLists()
+      fetchRoles()
       fetchData(id)
     }
   }, [id]);
@@ -128,12 +122,8 @@ const EditRole = () => {
 
     setLoading(false)
 
-    setRoleName(formData.name)
-    setColor(formData.color)
-
-    setSelectedProjects(formData.access)
-    setSelectedPages(formData.content)
-    setSelectedBlocks(formData.blocks)
+    setPassword(formData.password)
+    setSelectedRoles(formData.rolesID)
   }, [formData]);
 
   return <Layout>
@@ -146,128 +136,92 @@ const EditRole = () => {
         gridTemplateRows: '1fr auto',
         gap: 1,
       }}
-    > 
-      { !loading &&
+    >
+      {!loading &&
         <>
           <form style={{ heigth: '100%' }}>
             <Grid container spacing={6} alignItems="flex-start" justifyContent='start'>
               <Grid container spacing={2} item md={6} sm={12}>
                 <Grid item xs={12} sx={{ display: 'flex', gap: 2, alignContent: "center" }}>
                   <Typography variant="h5">Main info</Typography>
-                  {!!roleName && <Role color={color}>{roleName}</Role>}
                 </Grid>
 
-                <Grid item xs={8}>
-                  <TextField
-                    name="roleName"
-                    label="Project name"
-                    fullWidth
-                    value={roleName}
-                    onChange={(e) => { setRoleName(e.target.value) }}
-                    error={formErrors.name}
-                    helperText={formErrors.name}
-                  />
+                <Grid item xs={12}>
+                  <Stack direction={'row'} spacing={2}>
+                    <Avatar sx={{ width: 56, height: 56 }} />
+                    <Input name="username" label="Username"
+                      defaultValue={formData.username}
+                      error={formErrors.username} helperText={formErrors.username} />
+                  </Stack>
                 </Grid>
-                <Grid item xs={4}>
-                  <ColorPicker color={color} setColor={setColor}></ColorPicker>
+
+                <Grid item xs={6} >
+                  <Input name="login" label="Login"
+                    defaultValue={formData.login}
+                    error={formErrors.login} helperText={formErrors.login} />
                 </Grid>
+                <Grid item xs={6} >
+                  <FormControl fullWidth variant="outlined" >
+                    <InputLabel>Password</InputLabel>
+                    <OutlinedInput
+                      name="password"
+                      label="Password"
+                      value={password}
+                      onChange={(e) => { setPassword(e.target.value) }}
+                      endAdornment={
+                        <IconButton edge="end" onClick={() => setPassword(generateToken(12))}>
+                          <Autorenew />
+                        </IconButton>
+                      }
+                    />
+                  </FormControl>
+                </Grid>
+
                 <Grid item xs={12} >
                   <Input name="description" label="Description"
-                    multiline rows={4} defaultValue={formData.description}
+                    defaultValue={formData.description}
+                    multiline rows={4}
                   />
                 </Grid>
               </Grid>
 
               <Grid item md={6} sm={12}>
-                <Typography variant="h5">Access</Typography>
+                <Typography variant="h5">Roles</Typography>
                 <Divider sx={{ my: 2 }} />
 
-                {!!blocksList.length && <>
-                  <Typography variant="h6" sx={{ mt: 2 }}>Dashboard Blocks</Typography>
-                  <Paper sx={{
-                    m: 1, p: 2,
-                    maxHeight: '250px',
+                <Paper sx={{
+                  m: 1, p: 2,
+                  maxHeight: '350px',
+                  overflowY: 'auto'
+                }}>
+                  <TextField size="small" variant="outlined" fullWidth
+                    label="Search" onChange={(e) => setFilterRoles(e.target.value)} />
+
+                  <Box sx={{
+                    height: '100%',
                     overflowY: 'auto'
                   }}>
-                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                      {blocksList.map((el => (
-                        <Chip
-                          key={el._id}
-                          label={el.title}
-                          color={'primary'}
-                          variant={selectedBlocks.includes(el._id) ? "filled" : "outlined"}
-                          onClick={() => {
-                            if (selectedBlocks.includes(el._id)) {
-                              setSelectedBlocks(selectedBlocks.filter(id => id !== el._id))
-                            } else {
-                              setSelectedBlocks([...selectedBlocks, el._id])
-                            }
-                          }}
-                        />
-                      )))}
-                    </Box>
-                  </Paper>
-                </>}
-
-                {!!pagesList.length && <>
-                  <Typography variant="h6" sx={{ mt: 2 }}>Default Pages</Typography>
-                  <Paper sx={{
-                    m: 1, p: 2,
-                    maxHeight: '250px',
-                    overflowY: 'auto'
-                  }}>
-                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                      {pagesList.map((el => (
-                        <Chip
-                          key={el._id}
-                          label={el.title}
-                          color={'primary'}
-                          variant={selectedPages.includes(el._id) ? "filled" : "outlined"}
-                          onClick={() => {
-                            if (selectedPages.includes(el._id)) {
-                              setSelectedPages(selectedPages.filter(id => id !== el._id))
-                            } else {
-                              setSelectedPages([...selectedPages, el._id])
-                            }
-                          }}
-                        />
-                      )))}
-                    </Box>
-                  </Paper>
-                </>}
-
-                {!!projectsList.length && <>
-                  <Typography variant="h6" sx={{ mt: 2 }}>Projects</Typography>
-                  <Paper sx={{
-                    m: 1, p: 2,
-                    maxHeight: '350px',
-                    overflowY: 'auto'
-                  }}>
-                    <List >
-                      <ListItem>
-                        <TextField size="small" variant="outlined" fullWidth
-                          label="Search" onChange={(e) => setFilter(e.target.value)} />
-                      </ListItem>
-
-                      {filterProjectsList.map((el => (
+                    <List>
+                      {filterRolesList.map((el => (
                         <ListItem disablePadding key={el._id}>
                           <ListItemButton
-                            selected={selectedProjects.includes(el._id)}
+                            selected={selectedRoles.includes(el._id)}
+                            disabled={base && el.baseRole}
                             onClick={() => {
-                              if (selectedProjects.includes(el._id)) {
-                                setSelectedProjects(selectedProjects.filter(id => id !== el._id))
+                              if (selectedRoles.includes(el._id)) {
+                                setSelectedRoles(selectedRoles.filter(id => id !== el._id))
                               } else {
-                                setSelectedProjects([...selectedProjects, el._id])
+                                setSelectedRoles([...selectedRoles, el._id])
                               }
                             }}
                           >
-                            <ListItemText primary={el.name} />
+                            <Role sx={{ fontSize: '1em' }} color={el.color}>{el.name}</Role>
                           </ListItemButton>
                         </ListItem>
                       )))}
                     </List>
-                  </Paper>
-                </>}
+                  </Box>
+                </Paper>
               </Grid>
             </Grid>
           </form>
@@ -277,7 +231,7 @@ const EditRole = () => {
             justifyContent: 'flex-end',
             gap: 1,
           }}>
-            <Button onClick={handleSubmit(checkData)}><SaveIcon/></Button>
+            <Button onClick={handleSubmit(checkData)}><SaveIcon /></Button>
           </Box>
         </>
       }
@@ -292,4 +246,4 @@ const EditRole = () => {
   </Layout>
 }
 
-export default EditRole
+export default EditUser

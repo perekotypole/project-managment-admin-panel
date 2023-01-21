@@ -7,11 +7,19 @@ import jwt from 'jsonwebtoken'
 
 import initData from '../../initData.js'
 const defContent = [
-  ...initData?.contentPage,
-  ...initData?.contentBlocks
+  ...initData?.contentPage.map(page => ({
+    title: page.title,
+    slug: page.slug,
+    link: `/${page.slug}`,
+    type: 'page',
+  })),
+  ...initData?.contentBlocks.map(block => ({
+    title: block.title,
+    slug: block.slug,
+    type: 'block',
+  }))
 ]
 
-const initLogin = process.env.ADMIN_LOGIN || 'admin'
 const secret = process.env.SECRET || 'secret'
 const tokenTime = process.env.TOKENTIME || 20
 
@@ -24,40 +32,26 @@ export const database = (url) => mongoose
 import { User, Content, Session, Role } from '../models/index.js'
 
 export const checkInitData = async () => {
-  let content = await Content.find({
-    slug: { $in: defContent.map(el => el.slug) },
-  })
-
-  if (content.length !== defContent.length) {
-    await Content.deleteMany({})
-    content = await Content.insertMany([...initData?.contentPage.map(page => ({
-      title: page.title,
-      slug: page.slug,
-      link: `/${page.slug}`,
-      type: 'page',
-    })), ...initData?.contentBlocks.map(block => ({
-      title: block.title,
-      slug: block.slug,
-      type: 'block',
-    }))])
-  }
+  await Content.deleteMany({})
+  const content = await Content.insertMany(defContent)
 
   const contentForRole = {
     content: content.filter(el => el.type === 'page').map(el => el._id),
-    blocks: content.filter(el => el.type === 'blocks').map(el => el._id),
+    blocks: content.filter(el => el.type === 'block').map(el => el._id),
   }
 
-  let role = await Role.findOne({ name: 'admin' })
-  if (!role) role = await Role.create({ name: 'admin', ...contentForRole })
-  else await Role.findByIdAndUpdate(role._id, contentForRole)
+  let role = await Role.findOne({ baseRole: true })
+  if (!role) role = await Role.create({ name: 'admin', baseRole: true, ...contentForRole })
+  else await role.updateOne(contentForRole)
 
-  const admin = await User.findOne({ login: initLogin })
+  const admin = await User.findOne({ baseUser: true })
   if (!admin) await User.create({
+    baseUser: true,
     ...initData.admin,
     rolesID: [role._id]
   })
-  else User.findOneAndUpdate({
-    login: initLogin,
+  else await User.findOneAndUpdate({
+    baseUser: true,
     rolesID: { $ne: role._id }
   }, { $push: { rolesID: role._id } })
 }

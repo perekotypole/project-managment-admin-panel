@@ -2,11 +2,13 @@ import mongoose from 'mongoose'
 
 export const User = mongoose.model('User', {
   username: { type: String },
+  description: { type: String },
   login: { type: String, unique: true },
   password: { type: String },
   rolesID: [{ type: mongoose.Types.ObjectId }],
   startedProject: { type: mongoose.Types.ObjectId },
   accessStatus: { type: String },
+  baseUser: { type: Boolean },
   createdAt: { type: Date, default: () => new Date() },
 });
 
@@ -17,6 +19,7 @@ export const Role = mongoose.model('Role', {
   blocks: { type: [mongoose.Types.ObjectId] },
   content: { type: [mongoose.Types.ObjectId] },
   access: { type: [mongoose.Types.ObjectId] },
+  baseRole: { type: Boolean },
   createdAt: { type: Date, default: () => new Date() },
 });
 

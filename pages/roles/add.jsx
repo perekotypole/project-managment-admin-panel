@@ -66,8 +66,8 @@ const AddRole = () => {
 
   useEffect(() => {
     if (!projectsList.length
-      || pagesList.length
-      || blocksList.length
+      || !pagesList.length
+      || !blocksList.length
     ) fetchData()
   }, []);
 

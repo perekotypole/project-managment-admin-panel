@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { HexColorInput, HexColorPicker } from "react-colorful";
-import { Paper, Box, TextField  } from "@mui/material";
+import { Paper, Box } from "@mui/material";
 
 const ColorPicker = ({ color, setColor }) => {
   const [open, setOpen] = useState(false);
@@ -8,15 +8,19 @@ const ColorPicker = ({ color, setColor }) => {
   return <Box
     sx={{
       position: 'relative',
+      width: '100%', height: '100%'
     }}
     onFocus={() => { setOpen(true) }}
     onBlur={() => { setOpen(false) }}
   >
-    <TextField
-      fullWidth
-      value={color}
-      onChange={(e) => { setColor(e.target.value) }}
-    ></TextField>
+    <HexColorInput color={color} onChange={setColor} prefixed style={{
+      height: '100%',
+      width: '100%',
+      fontSize: 'inherit',
+      border: '1px solid #bbbbbb',
+      borderRadius: '4px',
+      padding: '1em',
+    }} />
 
     <Paper elevation={20}
       sx={{

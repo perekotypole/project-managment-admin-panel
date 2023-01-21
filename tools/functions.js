@@ -1,6 +1,6 @@
-export const generateToken = () => {
+export const generateToken = (length = 32) => {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  const res = Array(32).fill(null).map(_ => chars[Math.floor(Math.random() * chars.length)]).join('')
+  const res = Array(length).fill(null).map(_ => chars[Math.floor(Math.random() * chars.length)]).join('')
   return res
 }
 

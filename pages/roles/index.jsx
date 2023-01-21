@@ -135,11 +135,13 @@ const RolesPage = () => {
 
             <Stack direction="row">
               <IconButton href={`/roles/${roleDetails._id}`}><Edit /></IconButton>
-              { rolesList.length > 1 && 
+              {!roleDetails.baseRole && 
                 <IconButton onClick={() => removeRole(roleDetails)}><Delete /></IconButton>
               }
             </Stack>
           </Stack>
+
+          { roleDetails.baseRole && <Typography variant='body2'><i>(Base role for initial management)</i></Typography>}
 
           { roleDetails.description && <>
             <Typography variant='body2'><i>Description</i>: {roleDetails.description}</Typography>

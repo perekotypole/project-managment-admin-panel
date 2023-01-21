@@ -4,20 +4,24 @@ import { dataAccess } from './middleware/index.js'
 
 const router = Router()
 const accessSlug = 'roles'
+const usersAccessSlug = 'users'
 
 router.post('/', dataAccess, async (req, res) => {
   try {
-    const access = req.access.map(({slug}) => slug).includes(accessSlug)
+    const access = req.access.map(({slug}) => slug)
+      .some(e => [accessSlug, usersAccessSlug].includes(e))
     if (!access) {
       res.redirect('/')
       return
     }
   
-    const list = await Role.find({}).sort('-createdAt').select('name color')
+    const list = await Role.find({})
+      .sort('-createdAt')
+      .select('name color baseRole')
 
     return res.json({ 
       success: true,
-      rolesList: list
+      rolesList: list.sort(doc1 => !doc1.baseRole ? -1 : null)
     })
     
   } catch (error) {
@@ -98,7 +102,7 @@ router.post('/create', dataAccess, async (req, res) => {
     })
     
   } catch (error) {
-    console.error('/role/create => ', error)
+    console.error('/roles/create => ', error)
     return res.json({ error })
   }
 })
@@ -121,7 +125,7 @@ router.post('/edit', dataAccess, async (req, res) => {
     })
     
   } catch (error) {
-    console.error('/projects/edit => ', error)
+    console.error('/roles/edit => ', error)
     return res.json({ error })
   }
 })
@@ -135,14 +139,13 @@ router.post('/remove', dataAccess, async (req, res) => {
     } 
 
     const { id } = req.body
-
-    if (!id) {
-      res.json({ error: 'ID is required' })
-      return
-    }
+    if (!id) return res.json({ error: 'ID is required' })
   
+    const role = await Role.findById(id)
+    if (role.baseRole) return res.json({ error: 'Unable to remove base role' })
+    
     await User.updateMany({ rolesID: id }, { $pull: { rolesID: id } })
-    await Role.findByIdAndDelete(id)
+    await role.deleteOne()
   
     return res.json({ 
       success: true,

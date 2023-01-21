@@ -189,14 +189,12 @@ const UsersPage = () => {
         gridTemplateRows: '1fr auto'
       }}>
         {userDetails && <Box>
-          {/* <Typography variant='body2'><i>Created</i>: {new Date(userDetails.createdAt).toLocaleString('uk-UA')}</Typography> */}
-
           <Stack direction='row' spacing={1} justifyContent='space-between'>
             <Typography variant='h5'>{userDetails.username}</Typography>
 
             <Stack direction="row">
               <IconButton href={`/users/${userDetails._id}`}><Edit /></IconButton>
-              {usersList.length > 1 &&
+              {!userDetails.baseUser &&
                 <IconButton onClick={() => removeRole(userDetails)}><Delete /></IconButton>
               }
             </Stack>
@@ -205,7 +203,7 @@ const UsersPage = () => {
           <Box display={'flex'} sx={{ gap: 1, mb: 1 }}>
             {userDetails.rolesID.map((role => (
               <Role key={role._id} color={role.color}>{role.name}</Role>
-            )))}
+              )))}
           </Box>
 
           <Box>
@@ -219,81 +217,88 @@ const UsersPage = () => {
             </Typography>
           </Box>
 
-          <Divider sx={{ my: 2 }} />
+          {userDetails.baseUser && <Typography variant='body2'><i>(Base user for initial management)</i></Typography>}
 
-          <Box
-            display={'grid'}
-            sx={{
-              gridTemplateColumns: 'repeat(2, 1fr)',
-              gap: 2,
-            }}
-          >
-            <Paper sx={{
-              m: 1, p: 2,
-              maxHeight: '500px',
-              overflowY: 'auto'
-            }}>
-              <List subheader={
-                <Typography variant='h6'>Access status</Typography>
-              }>
-                {accessStatusList.map((el => (
-                  <ListItem disablePadding key={el.slug || 'nothing'}>
-                    <ListItemButton
-                      selected={selectedStatus == el.slug}
-                      onClick={() => setSelectedStatus(el.slug || null)}
-                    >
-                      <ListItemText primary={el.title} />
-                    </ListItemButton>
-                  </ListItem>
-                )))}
-              </List>
-            </Paper>
+          { userDetails.description && <>
+            <Typography variant='body2'><i>Description</i>: {userDetails.description}</Typography>
+          </>}
 
-            <Paper sx={{
-              m: 1, p: 2,
-              maxHeight: '500px',
-              overflowY: 'auto'
-            }}>
-              <List subheader={
-                <Typography variant='h6'>Started page</Typography>
-              }>
-                <ListItem disablePadding key={'dashboard'}>
-                  <ListItemButton
-                    selected={!selectedProject}
-                    onClick={() => setSelectedProject(null)}
-                  >
-                    <ListItemText primary={'Dashboard'} />
-                  </ListItemButton>
-                </ListItem>
+          {!userDetails.baseUser &&
+            <>
+              <Typography variant='body2'><i>Created</i>: {new Date(userDetails.createdAt).toLocaleString('uk-UA')}</Typography>
+              <Divider sx={{ my: 2 }} />
 
-                {projectsList.map((el => (
-                  <ListItem disablePadding key={el._id}>
-                    <ListItemButton
-                      disabled={el.type !== 'website'}
-                      selected={selectedProject === el._id}
-                      onClick={() => setSelectedProject(el._id)}
-                    >
-                      <ListItemText primary={el.name} />
-                    </ListItemButton>
-                  </ListItem>
-                )))}
-              </List>
-            </Paper>
-          </Box>
-          Project {selectedProject}
-          {(userDetails.startedProject || null)}
-          accessStatus {selectedStatus}
-          {(userDetails.accessStatus || null)}
-          
-          {((selectedProject !== userDetails.startedProject)
-           || (selectedStatus !== userDetails.accessStatus)) &&
-            <Box sx={{
-              display: 'flex',
-              justifyContent: 'flex-end',
-              gap: 1,
-            }}>
-              <Button onClick={saveChanged}><Save/></Button>
-            </Box>
+              <Box
+                display={'grid'}
+                sx={{
+                  gridTemplateColumns: 'repeat(2, 1fr)',
+                  gap: 2,
+                }}
+              >
+                <Paper sx={{
+                  m: 1, p: 2,
+                  maxHeight: '500px',
+                  overflowY: 'auto'
+                }}>
+                  <List subheader={
+                    <Typography variant='h6'>Access status</Typography>
+                  }>
+                    {accessStatusList.map((el => (
+                      <ListItem disablePadding key={el.slug || 'nothing'}>
+                        <ListItemButton
+                          selected={selectedStatus == el.slug}
+                          onClick={() => setSelectedStatus(el.slug || null)}
+                        >
+                          <ListItemText primary={el.title} />
+                        </ListItemButton>
+                      </ListItem>
+                    )))}
+                  </List>
+                </Paper>
+
+                <Paper sx={{
+                  m: 1, p: 2,
+                  maxHeight: '500px',
+                  overflowY: 'auto'
+                }}>
+                  <List subheader={
+                    <Typography variant='h6'>Started page</Typography>
+                  }>
+                    <ListItem disablePadding key={'dashboard'}>
+                      <ListItemButton
+                        selected={!selectedProject}
+                        onClick={() => setSelectedProject(null)}
+                      >
+                        <ListItemText primary={'Dashboard'} />
+                      </ListItemButton>
+                    </ListItem>
+
+                    {projectsList.map((el => (
+                      <ListItem disablePadding key={el._id}>
+                        <ListItemButton
+                          disabled={el.type !== 'website'}
+                          selected={selectedProject === el._id}
+                          onClick={() => setSelectedProject(el._id)}
+                        >
+                          <ListItemText primary={el.name} />
+                        </ListItemButton>
+                      </ListItem>
+                    )))}
+                  </List>
+                </Paper>
+              </Box>
+              
+              {((selectedProject !== userDetails.startedProject)
+              || (selectedStatus !== userDetails.accessStatus)) &&
+                <Box sx={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  gap: 1,
+                }}>
+                  <Button onClick={saveChanged}><Save/></Button>
+                </Box>
+              }
+            </>
           }
         </Box>}
       </Box>
