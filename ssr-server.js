@@ -53,9 +53,7 @@ app.prepare()
   api(server)
 
   server.get('/_next/*', (req, res) => handle(req, res))
-  server.get('*', verifyUser, pageAccess, (req, res) => {
-    return handle(req, res)
-  })
+  server.get('*', verifyUser, pageAccess, (req, res) => handle(req, res))
 
   server.listen(port, (err) => {
     if (err) throw err

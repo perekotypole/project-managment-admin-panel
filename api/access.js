@@ -1,18 +1,18 @@
 import { Router } from 'express'
-import { Content } from './models/index.js'
+import { Content, Project } from './models/index.js'
 import { dataAccess } from './middleware/index.js'
 
 const router = Router()
 
 router.post('/getPages', dataAccess, async (req, res) => {
-  const accessContent = req.accessIDs || []
-
   try {
-    const pages = await Content.find({ _id: { $in: accessContent }, type: 'page'})
+    const pages = await Content.find({ _id: { $in: req.contentIDs } })
+    const projects = await Project.find({ _id: { $in: req.projectsIDs }, type: 'website'})
   
     return res.json({ 
       success: true,
-      pages
+      pages,
+      projects,
     })
 
   } catch (error) {
@@ -22,8 +22,6 @@ router.post('/getPages', dataAccess, async (req, res) => {
 })
 
 router.post('/getBlocks', dataAccess, async (req, res) => {
-  const accessContent = req.accessIDs || []
-
   try {
     const blocks = await Content.find({ _id: { $in: accessContent }, type: 'block'})
   

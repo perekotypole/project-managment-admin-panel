@@ -8,7 +8,7 @@ const accessSlug = 'projects'
 
 router.post('/', dataAccess, async (req, res) => {
   try {
-    const access = req.access.map(({slug}) => slug).includes(accessSlug)
+    const access = req.content.map(({slug}) => slug).includes(accessSlug)
     if (!access) {
       res.redirect('/')
       return
@@ -37,7 +37,7 @@ router.post('/', dataAccess, async (req, res) => {
 
 router.post('/shortList', dataAccess, async (req, res) => {
   try {
-    const access = req.access.map(({slug}) => slug).includes(accessSlug)
+    const access = req.content.map(({slug}) => slug).includes(accessSlug)
     if (!access) {
       res.redirect('/')
       return
@@ -58,7 +58,7 @@ router.post('/shortList', dataAccess, async (req, res) => {
 
 router.post('/getOne', dataAccess, async (req, res) => {
   try {
-    const access = req.access.map(({slug}) => slug).includes(accessSlug)
+    const access = req.content.map(({slug}) => slug).includes(accessSlug)
     if (!access) {
       res.redirect('/')
       return
@@ -82,7 +82,7 @@ router.post('/getOne', dataAccess, async (req, res) => {
 
 router.post('/create', dataAccess, async (req, res) => {
   try {
-    const access = req.access.map(({slug}) => slug).includes(accessSlug)
+    const access = req.content.map(({slug}) => slug).includes(accessSlug)
     if (!access) {
       res.redirect('/')
       return
@@ -103,7 +103,7 @@ router.post('/create', dataAccess, async (req, res) => {
 
 router.post('/edit', dataAccess, async (req, res) => {
   try {
-    const access = req.access.map(({slug}) => slug).includes(accessSlug)
+    const access = req.content.map(({slug}) => slug).includes(accessSlug)
     if (!access) {
       res.redirect('/')
       return
@@ -127,7 +127,7 @@ router.post('/edit', dataAccess, async (req, res) => {
 
 router.post('/remove', dataAccess, async (req, res) => {
   try {
-    const access = req.access.map(({slug}) => slug).includes(accessSlug)
+    const access = req.content.map(({slug}) => slug).includes(accessSlug)
     if (!access) {
       res.redirect('/')
       return
@@ -156,7 +156,7 @@ router.post('/remove', dataAccess, async (req, res) => {
 
 router.post('/errors', dataAccess, async (req, res) => {
   try {
-    const access = req.access.map(({slug}) => slug).includes(accessSlug)
+    const access = req.content.map(({slug}) => slug).includes(accessSlug)
     if (!access) {
       res.redirect('/')
       return
@@ -183,7 +183,7 @@ router.post('/errors', dataAccess, async (req, res) => {
 
 router.post('/error/remove', dataAccess, async (req, res) => {
   try {
-    const access = req.access.map(({slug}) => slug).includes(accessSlug)
+    const access = req.content.map(({slug}) => slug).includes(accessSlug)
     if (!access) {
       res.redirect('/')
       return

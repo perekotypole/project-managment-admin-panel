@@ -91,3 +91,31 @@ export const refresh = async (refreshToken) => {
   const { userID, additionalData } = authData
   return await generateToken(authData._id, userID, additionalData)
 }
+
+export const mainPageRedirect = async (user) => {
+  if (user.accessStatus) return { status: user.accessStatus }
+  if (user.startedProject) return { project: user.startedProject.toString() }
+
+  const blocks = await Role.find({ _id: { $in: user.rolesID }}).distinct('blocks')
+  if (blocks.length) return { blocks: blocks.map(el => el.toString()).toString() }
+
+  return {}
+}
+
+export const paramsIsEqual = (accessParams, requestParams) => {
+  const equal = (a, b) => {
+    if (a === b) return true;
+    if (a == null || b == null) return false;
+    if (a.length !== b.length) return false;
+  
+    for (let i = 0; i < a.length; ++i) {
+      if (a[i] !== b[i]) return false;
+    }
+    return true;
+  }
+
+  for (const key in accessParams)
+    if (!equal(accessParams[key], requestParams[key]))
+      return false
+  return true
+}

@@ -2,8 +2,10 @@ import * as dotenv from 'dotenv'
 dotenv.config()
 
 import jwt from 'jsonwebtoken'
-import { refresh } from '../helpers/index.js'
-import { User, Content, Role } from '../models/index.js'
+import querystring from 'querystring'
+import { existPaths } from '../../initData.js'
+import { mainPageRedirect, paramsIsEqual, refresh } from '../helpers/index.js'
+import { User, Content, Role, Project } from '../models/index.js'
 
 const secret = process.env.SECRET || 'secret'
 
@@ -53,30 +55,39 @@ export const verifyUser = async (req, res, next) => {
 }
 
 export const pageAccess = async (req, res, next) => {
-  if (req.originalUrl === '/'
-    || req.originalUrl === '/login'
-    || req.originalUrl === '/favicon.ico') return next()
+  const originalUrl = req.originalUrl.match(/\/?(\w)*/)[0]
+
+  if (originalUrl === '/login'
+    || !existPaths.includes(originalUrl)) return next()
 
   const { userID = null } = req.user
-  if (!userID) {
+  const user = await User.findById(userID)
+
+  if (!user) {
     req.session.destroy()
 
     res.redirect('/login')
     return
   }
 
-  const user = await User.findById(userID)
+  if (originalUrl === '/') {
+    const params = await mainPageRedirect(user)
+    if (paramsIsEqual(params, req.query)) return next()
+
+    res.redirect(`/?${querystring.stringify(params)}`)
+    return
+  }
+
   const contentIDs = await Role.find({ _id: { $in: user.rolesID } }).distinct('content')
   const access = await Content.find({ _id: { $in: contentIDs || [] }})
 
-  const slug = req.originalUrl.split('/')[1]
-  if (!access.map(({ slug }) => slug).includes(slug)) {
+  if (!access.map(({ link = '' }) => link).includes(originalUrl)) {
     res.redirect('/')
     return
   }
 
-  req.accessIDs = contentIDs
-  req.access = access
+  // req.accessIDs = contentIDs
+  // req.access = access
 
   return next()
 }
@@ -85,12 +96,14 @@ export const dataAccess = async (req, res, next) => {
   const { userID } = req.user
 
   const user = await User.findById(userID)
-  const contentIDs = await Role.find({ _id: { $in: user.rolesID } }).distinct('content')
-  const blocksIDs = await Role.find({ _id: { $in: user.rolesID } }).distinct('blocks')
-  const access = await Content.find({ _id: { $in: [...contentIDs, ...blocksIDs] }})
 
-  req.accessIDs = [...contentIDs, ...blocksIDs]
-  req.access = access
+  req.contentIDs = await Role.find({ _id: { $in: user.rolesID } }).distinct('content')
+  req.blocksIDs = await Role.find({ _id: { $in: user.rolesID } }).distinct('blocks')
+  req.projectsIDs = await Role.find({ _id: { $in: user.rolesID } }).distinct('access')
 
+  req.content = await Content.find({ _id: { $in: req.contentIDs || [] }}).select('slug')
+  req.blocks = await Content.find({ _id: { $in: req.blocksIDs || [] }}).select('slug')
+  req.projects = await Project.find({ _id: { $in: req.projectsIDs || [] }}).select('name type link token')
+  
   return next()
 }

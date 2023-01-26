@@ -27,6 +27,12 @@ export const contentPage = [
   },
 ]
 
+export const existPaths = [
+  '/',
+  '/login',
+  ...contentPage.map(({slug}) => `/${slug}`)
+]
+
 export const admin = {
   username: 'admin',
   login: process.env.ADMIN_LOGIN || 'admin',
@@ -36,5 +42,6 @@ export const admin = {
 export default {
   contentBlocks,
   contentPage,
+  existPaths,
   admin,
 }

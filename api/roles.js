@@ -8,7 +8,7 @@ const usersAccessSlug = 'users'
 
 router.post('/', dataAccess, async (req, res) => {
   try {
-    const access = req.access.map(({slug}) => slug)
+    const access = req.content.map(({slug}) => slug)
       .some(e => [accessSlug, usersAccessSlug].includes(e))
     if (!access) {
       res.redirect('/')
@@ -32,7 +32,7 @@ router.post('/', dataAccess, async (req, res) => {
 
 router.post('/getOne', dataAccess, async (req, res) => {
   try {
-    const access = req.access.map(({slug}) => slug).includes(accessSlug)
+    const access = req.content.map(({slug}) => slug).includes(accessSlug)
     if (!access) {
       res.redirect('/')
       return
@@ -64,7 +64,7 @@ router.post('/getOne', dataAccess, async (req, res) => {
 
 router.post('/getAllContent', dataAccess, async (req, res) => {
   try {
-    const access = req.access.map(({slug}) => slug).includes(accessSlug)
+    const access = req.content.map(({slug}) => slug).includes(accessSlug)
     if (!access) {
       res.redirect('/')
       return
@@ -89,7 +89,7 @@ router.post('/getAllContent', dataAccess, async (req, res) => {
 
 router.post('/create', dataAccess, async (req, res) => {
   try {
-    const access = req.access.map(({slug}) => slug).includes(accessSlug)
+    const access = req.content.map(({slug}) => slug).includes(accessSlug)
     if (!access) {
       res.redirect('/')
       return
@@ -109,7 +109,7 @@ router.post('/create', dataAccess, async (req, res) => {
 
 router.post('/edit', dataAccess, async (req, res) => {
   try {
-    const access = req.access.map(({slug}) => slug).includes(accessSlug)
+    const access = req.content.map(({slug}) => slug).includes(accessSlug)
     if (!access) {
       res.redirect('/')
       return
@@ -132,7 +132,7 @@ router.post('/edit', dataAccess, async (req, res) => {
 
 router.post('/remove', dataAccess, async (req, res) => {
   try {
-    const access = req.access.map(({slug}) => slug).includes(accessSlug)
+    const access = req.content.map(({slug}) => slug).includes(accessSlug)
     if (!access) {
       res.redirect('/')
       return
