@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../../tools/axios";
 import { useEffect, useMemo, useState } from "react";
 import {
   Box, Button, Checkbox, Chip, Divider, IconButton, Link, List, ListItem,
@@ -22,14 +22,14 @@ const RolesPage = () => {
   , [rolesList, filter])
 
   const fetchRoles = async () => {
-    const { data: result } = await axios.post('/api/roles')
+    const { data: result } = await axios.post('/roles')
     if (!result.success) return
 
     const { rolesList: data } = result
     setRolesList(data)
   }
   const fetchRoleDetail = async () => {
-    const { data: result } = await axios.post('/api/roles/getOne', { id: selectedRole })
+    const { data: result } = await axios.post('/roles/getOne', { id: selectedRole })
     if (!result.success) return
 
     const { role } = result
@@ -69,7 +69,7 @@ const RolesPage = () => {
       return
     }
 
-    await axios.post('/api/roles/remove', { id: elemOnRemove._id })
+    await axios.post('/roles/remove', { id: elemOnRemove._id })
     fetchRoles()
 
     setRoleDetails(null)

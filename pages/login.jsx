@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 
-import axios from 'axios';
+import axios from '../tools/axios';
 import { TextField, Button, Box } from '@mui/material';
 import LoginLayout from '../components/LoginLayout';
 
@@ -19,7 +19,7 @@ const Login = () => {
     
     setError({})
 
-    const { data: result } = await axios.post('/api/auth/login', { login, password })
+    const { data: result } = await axios.post('/auth/login', { login, password })
     if (result?.success) return router.push('/');
 
     return setError(result?.error || { global: 'Unknown error' })

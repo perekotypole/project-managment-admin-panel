@@ -23,7 +23,7 @@ const DBUrl = `mongodb://localhost/${process.env.DATABASE || 'adminpanel'}`
 
 database(DBUrl)
   .then(async () => {
-    console.log('Database is connected')
+    console.info('Database is connected')
     await checkInitData()
   })
   .catch((ex) => {
@@ -57,7 +57,7 @@ app.prepare()
 
   server.listen(port, (err) => {
     if (err) throw err
-    console.log(`> Ready on http://${hostname}:${port}`)
+    console.info(`Ready on http://${hostname}:${port}`)
   })
 })
 .catch((ex) => {

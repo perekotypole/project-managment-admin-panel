@@ -4,7 +4,7 @@ import { Box, Button, FormControl,
   MenuItem, OutlinedInput, TextField, Typography
 } from '@mui/material';
 
-import axios from 'axios';
+import axios from '../../tools/axios';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -76,7 +76,7 @@ const AddProject = () => {
     handleOpen()
   }
   const onSubmit = async () => {
-    const { data: result } = await axios.post('/api/projects/create', formData)
+    const { data: result } = await axios.post('/projects/create', formData)
     if (!result.success) return handleClose()
 
     router.back()

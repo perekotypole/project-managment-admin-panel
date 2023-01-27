@@ -1,7 +1,7 @@
-import { Box, Paper } from '@mui/material';
+import { Box } from '@mui/material';
 import Header from './Header';
 
-const Layout = ({ children }) => {
+const Layout = ({ children, noheader = false }) => {
   return <Box
     sx={{
       height: '100vh',
@@ -12,7 +12,7 @@ const Layout = ({ children }) => {
       gap: '3vh'
     }}
   >
-    <Header></Header>
+    <Header onlyLogout={noheader}></Header>
 
     <Box
       id="root"

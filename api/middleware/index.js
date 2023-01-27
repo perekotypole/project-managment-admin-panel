@@ -71,7 +71,7 @@ export const pageAccess = async (req, res, next) => {
   }
 
   if (originalUrl === '/') {
-    const params = await mainPageRedirect(user)
+    const params = await mainPageRedirect(user, req.query)
     if (paramsIsEqual(params, req.query)) return next()
 
     res.redirect(`/?${querystring.stringify(params)}`)

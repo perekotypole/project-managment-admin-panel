@@ -1,5 +1,5 @@
-import { Box, Button, Link } from '@mui/material';
-import axios from 'axios';
+import { Box, Button, Divider, Link } from '@mui/material';
+import axios from '../tools/axios';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 
@@ -10,17 +10,19 @@ const defaultNav = [
   },
 ]
 
-const Header = () => {
+const Header = ({ onlyLogout = false }) => {
   const router = useRouter()
   const [accessPages, setAccessPages] = useState([]);
+  const [projectsLinks, setProjectsLinks] = useState([]);
   
   const navigation = useMemo(() => [...defaultNav, ...accessPages], [accessPages]);
 
   const getPages = async () => {
-    const { data: result } = await axios.post('/api/access/getPages')
+    const { data: result } = await axios.post('/access/getPages')
     if (!result?.success) return
 
     setAccessPages(result.pages)
+    setProjectsLinks(result.projects)
   }
 
   useEffect(() => {
@@ -28,7 +30,7 @@ const Header = () => {
   }, []);
 
   const onLogout = async () => {
-    const { data: result } = await axios.post('/api/auth/logout',)
+    const { data: result } = await axios.post('/auth/logout',)
     if (result?.success) return router.push('/login');
   }
 
@@ -72,13 +74,25 @@ const Header = () => {
         alignItems: 'center'
       }}
     >
-      { navigation.map(({ title, link }, index) => <NavLink
-        active={link.split('/')[1] === router.pathname.split('/')[1]}
-        href={link}
-        key={`link-${index}`}
-      >
-        {title}
-      </NavLink>) }
+      {!onlyLogout && <>
+        { navigation.map(({ title, link }, index) => <NavLink
+          active={link.split('/')[1] === router.pathname.split('/')[1]}
+          href={link}
+          key={`link-${index}`}
+        >
+          {title}
+        </NavLink>) }
+
+        <Divider sx={{ height: '2em', width: '1px', borderWidth: '1px' }}/>
+
+        { projectsLinks.map(({ _id, name }) => <NavLink
+          active={router.query.project === _id}
+          href={`/?project=${_id}`}
+          key={`project-${_id}`}
+        >
+          {name}
+        </NavLink>) }
+      </>}
 
       <Button
         onClick={onLogout}

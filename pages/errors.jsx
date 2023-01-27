@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../tools/axios";
 import { useEffect, useMemo, useState } from "react";
 import {
   Box, Button, Checkbox, FormControlLabel, IconButton, List, ListItem,
@@ -47,14 +47,14 @@ const ErrorsPage = () => {
   }, [errorsList, selectedProject])
 
   const fetchProjects = async () => {
-    const { data: result } = await axios.post('/api/projects/shortList')
+    const { data: result } = await axios.post('/projects/shortList')
     if (!result.success) return
 
     const { projectsList } = result
     setProjectsList(projectsList)
   }
   const fetchErrors = async () => {
-    const { data: result } = await axios.post('/api/projects/errors')
+    const { data: result } = await axios.post('/projects/errors')
     if (!result.success) return
 
     const { errorsList } = result
@@ -99,7 +99,7 @@ const ErrorsPage = () => {
 
     if (remember) setAutoErrorRemoval()
 
-    await axios.post('/api/projects/error/remove', { id: remove.id })
+    await axios.post('/projects/error/remove', { id: remove.id })
     fetchErrors()
     handleModalClose()
   }

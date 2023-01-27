@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../../tools/axios";
 import { useEffect, useMemo, useState } from "react";
 import {
   Avatar,
@@ -37,14 +37,14 @@ const UsersPage = () => {
     , [usersList, filter])
 
   const fetchUsers = async () => {
-    const { data: result } = await axios.post('/api/users')
+    const { data: result } = await axios.post('/users')
     if (!result.success) return
 
     const { usersList: data } = result
     setUsersList(data)
   }
   const fetchUserDetail = async () => {
-    const { data: result } = await axios.post('/api/users/getOne', { id: selectedUser })
+    const { data: result } = await axios.post('/users/getOne', { id: selectedUser })
     if (!result.success) return
 
     const { user, projects } = result
@@ -93,7 +93,7 @@ const UsersPage = () => {
       return
     }
 
-    await axios.post('/api/users/remove', { id: elemOnRemove._id })
+    await axios.post('/users/remove', { id: elemOnRemove._id })
     fetchUsers()
 
     setUserDetails(null)
@@ -103,7 +103,7 @@ const UsersPage = () => {
   }
 
   const saveChanged = async () => {
-    await axios.post('/api/users/updateSelectedData', {
+    await axios.post('/users/updateSelectedData', {
       id: selectedUser,
       status: selectedStatus,
       project: selectedProject,

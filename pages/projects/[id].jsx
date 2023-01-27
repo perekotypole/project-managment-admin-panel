@@ -4,7 +4,7 @@ import { Box, Button, FormControl,
   MenuItem, OutlinedInput, TextField, Typography
 } from '@mui/material';
 
-import axios from 'axios';
+import axios from '../../tools/axios';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -48,7 +48,7 @@ const EditProject = () => {
   const [formErrors, setFormErrors] = useState({})
 
   const fetchData = async (id) => {
-    const { data: result } = await axios.post('/api/projects/getOne', { id })
+    const { data: result } = await axios.post('/projects/getOne', { id })
     if (!result.success) return handleClose()
 
     const { project: data } = result
@@ -87,7 +87,7 @@ const EditProject = () => {
     handleOpen()
   }
   const onSubmit = async () => {
-    const { data: result } = await axios.post('/api/projects/edit', { id, projectData: formData })
+    const { data: result } = await axios.post('/projects/edit', { id, projectData: formData })
     if (!result.success) return handleClose()
 
     router.back()

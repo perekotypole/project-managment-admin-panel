@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from '../../tools/axios';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -51,7 +51,7 @@ const AddRole = () => {
     , [rolesList, filterRoles])
 
   const fetchData = async () => {
-    const { data: result } = await axios.post('/api/roles')
+    const { data: result } = await axios.post('/roles')
     if (!result.success) return
 
     const { rolesList } = result
@@ -88,7 +88,7 @@ const AddRole = () => {
   }
 
   const onSubmit = async () => {
-    const { data: result } = await axios.post('/api/users/create', formData)
+    const { data: result } = await axios.post('/users/create', formData)
     if (!result.success) return handleClose()
 
     router.back()

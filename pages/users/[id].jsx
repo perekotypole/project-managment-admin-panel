@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from '../../tools/axios';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -55,7 +55,7 @@ const EditUser = () => {
     , [rolesList, filterRoles])
 
   const fetchData = async () => {
-    const { data: result } = await axios.post('/api/users/getOne', { id })
+    const { data: result } = await axios.post('/users/getOne', { id })
     if (!result.success) return
 
     const { user } = result
@@ -71,7 +71,7 @@ const EditUser = () => {
   }
 
   const fetchRoles = async () => {
-    const { data: result } = await axios.post('/api/roles')
+    const { data: result } = await axios.post('/roles')
     if (!result.success) return
 
     const { rolesList } = result
@@ -104,7 +104,7 @@ const EditUser = () => {
   }
 
   const onSubmit = async () => {
-    const { data: result } = await axios.post('/api/users/edit', { id, userData: formData })
+    const { data: result } = await axios.post('/users/edit', { id, userData: formData })
     if (!result.success) return handleClose()
 
     router.back()

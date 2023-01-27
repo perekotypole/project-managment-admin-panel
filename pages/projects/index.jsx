@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from '../../tools/axios';
 import { useEffect, useMemo, useState } from 'react';
 import Layout from '../../components/Layout';
 import Modal from '../../components/Modal';
@@ -173,7 +173,7 @@ const Projects = () => {
   }, [data])
 
   const fetchData = async () => {
-    const { data: result } = await axios.post('/api/projects')
+    const { data: result } = await axios.post('/projects')
     if (!result.success) return
 
     const { projectsList } = result
@@ -214,7 +214,7 @@ const Projects = () => {
       return
     }
 
-    await axios.post('/api/projects/remove', { id: elemOnRemove.id })
+    await axios.post('/projects/remove', { id: elemOnRemove.id })
     fetchData()
     handleModalClose()
   }

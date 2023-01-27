@@ -92,8 +92,14 @@ export const refresh = async (refreshToken) => {
   return await generateToken(authData._id, userID, additionalData)
 }
 
-export const mainPageRedirect = async (user) => {
+export const mainPageRedirect = async (user, currentParams) => {
   if (user.accessStatus) return { status: user.accessStatus }
+
+  if (currentParams.project) {
+    const project = await Role.findOne({ _id: { $in: user.rolesID }, access: currentParams.project })
+    if (project) return { project: currentParams.project }
+  }
+
   if (user.startedProject) return { project: user.startedProject.toString() }
 
   const blocks = await Role.find({ _id: { $in: user.rolesID }}).distinct('blocks')
