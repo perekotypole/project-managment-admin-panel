@@ -18,7 +18,12 @@ const Layout = ({ children, noheader = false }) => {
       id="root"
       sx={{ overflow: 'hidden' }}
     >
-      {children}
+      <Box sx={{
+        height: "100%",
+        overflow: 'auto',
+      }}>
+        {children}
+      </Box>
     </Box>
 
     <Box

@@ -122,10 +122,10 @@ const UsersPage = () => {
       gridTemplateColumns: '2fr 3fr',
       '@media screen and (max-width: 780px)': {
         gridTemplateColumns: '1fr',
-        gridTemplateRows: '1fr 2fr',
+        gridTemplateRows: '350px auto',
       },
       gap: 4,
-      height: '100%',
+      minHeight: '100%',
     }}>
       <Paper sx={{
         m: 1, p: 2,
@@ -232,6 +232,9 @@ const UsersPage = () => {
                 display={'grid'}
                 sx={{
                   gridTemplateColumns: 'repeat(2, 1fr)',
+                  '@media screen and (max-width: 780px)': {
+                    gridTemplateColumns: '1fr',
+                  },
                   gap: 2,
                 }}
               >
@@ -276,7 +279,7 @@ const UsersPage = () => {
                     {projectsList.map((el => (
                       <ListItem disablePadding key={el._id}>
                         <ListItemButton
-                          disabled={el.type !== 'website'}
+                          disabled={el.type !== 'website' || !el.link}
                           selected={selectedProject === el._id}
                           onClick={() => setSelectedProject(el._id)}
                         >

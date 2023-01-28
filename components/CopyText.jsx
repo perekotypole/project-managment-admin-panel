@@ -28,6 +28,7 @@ const CopyText = ({ children }) => {
           onClick={handleTooltipOpen}
           sx={{
             p: '0 .5em .1em .5em',
+            m: '.1em',
             color: '#000',
             textTransform: 'none',
             backgroundColor: "#dae3f1",

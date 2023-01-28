@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Link } from '@mui/material';
+import { Avatar, Box, Button, Divider, Link, Menu, MenuItem } from '@mui/material';
 import axios from '../tools/axios';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
@@ -12,10 +12,23 @@ const defaultNav = [
 
 const Header = ({ onlyLogout = false }) => {
   const router = useRouter()
+  const [user, setUser] = useState([]);
   const [accessPages, setAccessPages] = useState([]);
   const [projectsLinks, setProjectsLinks] = useState([]);
   
   const navigation = useMemo(() => [...defaultNav, ...accessPages], [accessPages]);
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => setAnchorEl(event.currentTarget)
+  const handleClose = () => setAnchorEl(null)
+
+  const fetchUser = async () => {
+    const { data: result } = await axios.post('/access/user')
+    if (!result?.success) return
+
+    setUser(result.user)
+  }
 
   const getPages = async () => {
     const { data: result } = await axios.post('/access/getPages')
@@ -27,6 +40,7 @@ const Header = ({ onlyLogout = false }) => {
 
   useEffect(() => {
     getPages()
+    fetchUser()
   }, []);
 
   const onLogout = async () => {
@@ -95,11 +109,30 @@ const Header = ({ onlyLogout = false }) => {
       </>}
 
       <Button
-        onClick={onLogout}
         sx={{
           marginLeft: 'auto'
         }}
-      >Logout</Button>
+        id="basic-button"
+        aria-controls={open ? 'basic-menu' : undefined}
+        aria-haspopup="true"
+        aria-expanded={open ? 'true' : undefined}
+        onClick={handleClick}
+      >
+        <Avatar sx={{ width: '1.5em', height: '1.5em', mr: 1 }} src={user.image} />
+        {user.username}
+      </Button>
+
+      <Menu
+        id="basic-menu"
+        anchorEl={anchorEl}
+        open={open}
+        onClose={handleClose}
+        MenuListProps={{
+          'aria-labelledby': 'basic-button',
+        }}
+      >
+        <MenuItem onClick={onLogout}>Logout</MenuItem>
+      </Menu>
     </Box>
   </Box>
 }

@@ -110,10 +110,10 @@ const ErrorsPage = () => {
       gridTemplateColumns: '1fr 3fr',
       '@media screen and (max-width: 780px)': {
         gridTemplateColumns: '1fr',
-        gridTemplateRows: '1fr 2fr',
+        gridTemplateRows: '250px auto',
       },
       gap: 4,
-      height: '100%',
+      minHeight: '100%',
     }}>
       <Paper sx={{
         m: 1, p: 2,

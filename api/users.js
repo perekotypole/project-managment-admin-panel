@@ -52,7 +52,7 @@ router.post('/getOne', dataAccess, async (req, res) => {
     const projectsIDs = await Role.find({ _id: { $in: user.rolesID } }).distinct('access')
     const projects = await Project.find({
       _id: { $in: projectsIDs || [] },
-    }).sort('-createdAt').select('name type')
+    }).sort('-createdAt').select('name type link')
 
     return res.json({ 
       success: true,

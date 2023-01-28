@@ -1,8 +1,24 @@
 import { Router } from 'express'
-import { Content, Project } from './models/index.js'
+import { Content, Project, User } from './models/index.js'
 import { dataAccess } from './middleware/index.js'
 
 const router = Router()
+
+router.post('/user', dataAccess, async (req, res) => {
+  try {
+    const { userID = null } = req.user
+    const user = await User.findById(userID).select('username image')
+  
+    return res.json({ 
+      success: true,
+      user
+    })
+
+  } catch (error) {
+    console.error('/access/user => ', error)
+    return res.json({ error })
+  }
+})
 
 router.post('/getPages', dataAccess, async (req, res) => {
   try {

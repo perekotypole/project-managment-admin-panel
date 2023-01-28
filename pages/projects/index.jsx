@@ -13,6 +13,7 @@ import {
   Stack,
   Typography,
   TextField,
+  Divider,
 } from '@mui/material';
 import {
   WebAsset as WebAssetIcon,
@@ -23,19 +24,15 @@ import {
   Replay,
   ContentCopy,
 } from '@mui/icons-material';
+import CopyText from '../../components/CopyText';
 
 const columns = [
   { id: 'status', align: 'center', style: { px: 0, width: '10px' } },
-  { id: 'link', style: { px: 0, width: 0 } },
-  { id: 'name', label: 'Name', style: { minWidth: 170, fontWeight: 700 } },
-  { id: 'description', label: 'Description', style: { maxWidth: 350 },
-    format: (value) => value ? value.length > 100 ? `${value.substr(0, 100)}...` : value : '',
-  },
+  { id: 'link', style: { px: 0, width: '5px' } },
+  { id: 'name', label: 'Name', style: { fontWeight: 700 } },
   { id: 'date', label: 'Last check time', style: { whiteSpace: 'nowrap' },
-    format: (value) => value ? new Date(value)?.toLocaleString('uk-UA') : '',
-  },
+    format: (value) => value ? new Date(value)?.toLocaleString('uk-UA') : ''},
   { id: 'errors', label: 'Errors', align: 'right' },
-  { id: 'events', style: { width: 0 } },
 ];
 
 const ProjectLink = ({ type, link }) => {
@@ -65,112 +62,37 @@ const ProjectLink = ({ type, link }) => {
   >{icon}</IconButton>
 }
 
-const Row = ({ row, columns, onRemove = () => {} }) => {
-  const [open, setOpen] = useState(false);
-  const { hiddenInfo = {} } = row
-
-  return <>
-    <TableRow hover key={row.code} onClick={() => { setOpen(!open) }}>
-      {columns.map((column) => {
-        const value = row[column.id];
-
-        if (column.id === 'events') {
-          return <TableCell key={column.id}>
-            <Stack direction="row">
-              <IconButton href={`/projects/${row.id}`}><Edit /></IconButton>
-              <IconButton onClick={onRemove}><Delete /></IconButton>
-            </Stack>
-          </TableCell>
-        }
-
-        if (column.id === 'status') {
-          return <TableCell key={column.id}
-            sx={{
-              maxWidth: column.width,
-              p: 0,
-              overflow: 'hidden',
-              borderRadius: '1em',
-              backgroundColor: value ? 'var(--color-green)' : 'var(--color-red)',
-            }}
-          />
-        }
-
-        return (
-          <TableCell
-            key={column.id}
-            align={column.align}
-            sx={{ ...column.style }}
-          >
-            {column.format ? column.format(value) : value}
-          </TableCell>
-        );
-      })}
-    </TableRow>
-
-    <TableRow>
-      <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={columns.length}>
-        <Collapse in={open} timeout="auto" unmountOnExit>
-          { row.description.length > 100 && 
-            <Typography variant='body2'
-              sx={{ p: '1em', display: 'block' }}
-            >{row.description}</Typography>
-          }
-
-          <Paper sx={{ m: 2 }}>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell><b>Token</b></TableCell>
-                  <TableCell><b>Reload time</b></TableCell>
-                  <TableCell><b>Telegram</b></TableCell>
-                </TableRow>
-              </TableHead>
-
-              <TableBody>
-                <TableRow>
-                  <TableCell>
-                    {hiddenInfo.token}
-                    <IconButton onClick={() => navigator.clipboard.writeText(hiddenInfo.token)}><ContentCopy/></IconButton>
-                  </TableCell>
-                  
-                  <TableCell>{hiddenInfo.reloadTime}</TableCell>
-                  
-                  <TableCell>
-                    <div><i>Token: </i>{hiddenInfo.telegram.token}</div>
-                    <div><i>Chat: </i><a href={hiddenInfo.telegram.chat}>{hiddenInfo.telegram.chat}</a></div>
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
-          </Paper>
-        </Collapse>
-      </TableCell>
-    </TableRow>
-  </>
-}
-
 const Projects = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   
   const [data, setData] = useState([]);
+  const [selectedProject, setSelectedProject] = useState(null);
+  const [projectDetails, setProjectDetails] = useState();
 
   const rows = useMemo(() => {
     return data.map(el => ({
+      ...el,
       id: el._id,
-      status: el.status,
-      name: el.name,
-      description: el.description,
       link: <ProjectLink link={el.link} type={el.type} />,
       date: el.checkDate,
       errors: el.errorsCount,
-      hiddenInfo: {
-        token: el.token,
-        reloadTime: el.reloadTime,
-        telegram: el.telegram,
-      }
     }))
   }, [data])
+
+  useEffect(() => {
+    if (!selectedProject) return
+
+    setProjectDetails(rows.find(el => el.id === selectedProject))
+  }, [selectedProject]);
+  console.log(projectDetails);
+
+  const [filter, setFilter] = useState();
+  const filterList = useMemo(() => filter
+    ? rows.filter(({ name }) =>
+      name.toLowerCase().indexOf(filter.toLowerCase()) !== -1)
+    : rows
+    , [rows, filter])
 
   const fetchData = async () => {
     const { data: result } = await axios.post('/projects')
@@ -221,69 +143,169 @@ const Projects = () => {
 
   return <Layout>
     <Box sx={{
-      width: '100%',
-      height: '100%',
-      maxHeight: '100%',
-      overflow: 'hidden',
       display: 'grid',
-      gridTemplateRows: '1fr auto'
+      gridTemplateColumns: '1fr 1fr',
+      '@media screen and (max-width: 780px)': {
+        gridTemplateColumns: '1fr',
+        gridTemplateRows: '500px auto',
+      },
+      gap: 4,
+      minHeight: '100%',
     }}>
+      <Paper sx={{
+        m: 1, p: 2,
+        overflow: 'hidden',
+        maxHeight: 'calc(100% - 16px)',
+        display: 'grid',
+        gridTemplateRows: 'auto 1fr auto',
+        gap: 1,
+      }}>
+        <TextField size="small" variant="outlined" fullWidth
+          label="Search" onChange={(e) => setFilter(e.target.value)} />
 
-      <TableContainer>
-        <Table stickyHeader aria-label="sticky table" >
-          <TableHead>
-            <TableRow>
-              {columns.map((column) => (
-                <TableCell
-                  key={column.id}
-                  align={column.align}
-                  sx={{
-                    fontWeight: 600,
-                    whiteSpace: 'nowrap',
-                    ...column.style,
-                  }}
-                >
-                  {column.label}
-                </TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
+        <Box sx={{
+          width: '100%',
+          height: '100%',
+          maxHeight: '100%',
+          overflow: 'hidden',
+          display: 'grid',
+          gridTemplateRows: '1fr auto'
+        }}>
 
-          <TableBody>
-            {rows
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row, i) => <Row
-                key={`row-${i}`}
-                row={row} columns={columns}
-                onRemove={() => {removeProject(row)}}
-              />)}
-          </TableBody>
-        </Table>
-      </TableContainer>
+          <TableContainer>
+            <Table stickyHeader aria-label="sticky table" >
+              <TableHead>
+                <TableRow>
+                  {columns.map((column) => (
+                    <TableCell
+                      key={column.id}
+                      align={column.align}
+                      sx={{
+                        fontWeight: 600,
+                        whiteSpace: 'nowrap',
+                        ...column.style,
+                      }}
+                    >
+                      {column.label}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
 
-      <Stack direction="row" sx={{ justifyContent: 'end', alignItems: 'center' }} >
-        <Button onClick={() => {
-          setData([])
-          setPage(0)
-          fetchData()
-        }}><Replay/></Button>
+              <TableBody>
+                {filterList
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((row, i) => <TableRow hover
+                    key={`row-${i}`}
+                    selected={selectedProject === row.id}
+                    onClick={() => setSelectedProject(row.id)}
+                  >
+                    {columns.map((column) => {
+                      const value = row[column.id];
+              
+                      if (column.id === 'status') {
+                        return <TableCell key={column.id}
+                          sx={{
+                            maxWidth: column.width,
+                            p: 0,
+                            overflow: 'hidden',
+                            borderRadius: '1em',
+                            backgroundColor: value ? 'var(--color-green)' : 'var(--color-red)',
+                          }}
+                        />
+                      }
+              
+                      return (
+                        <TableCell
+                          key={column.id}
+                          align={column.align}
+                          sx={{ ...column.style }}
+                        >
+                          {column.format ? column.format(value) : value}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>)}
+              </TableBody>
+            </Table>
+          </TableContainer>
 
-        <Button href="/projects/add"><AddCircle/></Button>
+          <Stack direction="row" sx={{ justifyContent: 'end', alignItems: 'center' }} >
+            <Button onClick={() => {
+              setData([])
+              setPage(0)
+              fetchData()
+            }}><Replay/></Button>
 
-        <TablePagination
-          rowsPerPageOptions={[10, 25, 50]}
-          component="div"
-          count={rows.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
+            <Button href="/projects/add"><AddCircle/></Button>
 
-          sx={{
-            height: 'fit-content'
-          }}
-        />
-      </Stack>
+            <TablePagination
+              rowsPerPageOptions={[10, 25, 50]}
+              component="div"
+              count={filterList.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+
+              sx={{
+                height: 'fit-content'
+              }}
+            />
+          </Stack>
+        </Box>
+      </Paper>
+
+      <Box sx={{
+        width: '100%',
+        maxHeight: '100%',
+        overflow: 'hidden',
+        display: 'grid',
+        gridTemplateRows: '1fr auto'
+      }}>
+        {projectDetails && <Box>
+          <Stack direction='row' spacing={1} justifyContent='space-between'>
+            <Stack direction='row' spacing={1} alignItems='center'>
+                <Typography variant='h5'
+                  color={projectDetails.status ? 'var(--color-green)' : 'var(--color-red)'}
+                >{projectDetails.name}</Typography>
+
+                {projectDetails.link}
+            </Stack>
+
+            <Stack direction="row">
+              <IconButton href={`/projects/${projectDetails.id}`}><Edit /></IconButton>
+              <IconButton onClick={() => removeProject(projectDetails)}><Delete /></IconButton>
+            </Stack>
+          </Stack>
+
+          { projectDetails.description && <>
+            <Typography variant='body2'><i>Description</i>: {projectDetails.description}</Typography>
+          </>}
+          <Typography variant='body2'><i>Created</i>: {new Date(projectDetails.createdAt).toLocaleString('uk-UA')}</Typography>
+          <Typography variant='body2'><i>Type</i>: {projectDetails.type}</Typography>
+          
+          <Divider sx={{ my: 2 }} />
+
+          <Typography variant='subtitle1'><b>Token</b>: <CopyText>{projectDetails.token}</CopyText></Typography>
+          <Typography variant='subtitle1'><b>Reload time</b>: {projectDetails.reloadTime}s</Typography>
+          <Typography variant='subtitle1'><b>Last check</b>: {projectDetails.date ? new Date(projectDetails.date)?.toLocaleString('uk-UA') : 'No check'}</Typography>
+          <Typography variant='subtitle1'><b>Errors</b>: {projectDetails.errors}</Typography>
+          
+          { projectDetails.requestLink && <>
+            <Typography variant='subtitle1'><b>Request link</b>: <CopyText>{projectDetails.requestLink}</CopyText></Typography>
+          </>}
+
+
+          { (projectDetails.telegram?.token || projectDetails.telegram?.chat) && <>
+            <Divider sx={{ my: 1 }} />
+
+            <Typography variant='subtitle1'><b>Telegram</b></Typography>
+            <Typography variant='subtitle2'><b>Token:</b> <CopyText>{projectDetails.telegram?.token}</CopyText></Typography>
+            <Typography variant='subtitle2'><b>Chat:</b> <CopyText>{projectDetails.telegram?.chat}</CopyText></Typography>
+          </>}
+        </Box>}
+      </Box>
     </Box>
 
     <Modal

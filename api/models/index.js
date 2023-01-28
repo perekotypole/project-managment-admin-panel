@@ -3,6 +3,7 @@ import mongoose from 'mongoose'
 export const User = mongoose.model('User', {
   username: { type: String },
   description: { type: String },
+  image: { type: String },
   login: { type: String, unique: true },
   password: { type: String },
   rolesID: [{ type: mongoose.Types.ObjectId }],
