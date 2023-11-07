@@ -56,7 +56,7 @@ const AddRole = () => {
 
   const fetchData = async () => {
     const { data: result } = await axios.post('/roles/getAllContent')
-    if (!result.success) return
+    if (!result.success) return console.error(result.error || result);
 
     const { projects, blocks, pages } = result
     setProjectsList(projects)
@@ -98,7 +98,10 @@ const AddRole = () => {
   
   const onSubmit = async () => {
     const { data: result } = await axios.post('/roles/create', formData)
-    if (!result.success) return handleClose()
+    if (!result.success) {
+      console.error(result.error || result);
+      return handleClose()
+    }
 
     router.back()
   }

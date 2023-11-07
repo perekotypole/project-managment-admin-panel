@@ -48,14 +48,14 @@ const ErrorsPage = () => {
 
   const fetchProjects = async () => {
     const { data: result } = await axios.post('/projects/shortList')
-    if (!result.success) return
+    if (!result.success) return console.error(result.error || result);
 
     const { projectsList } = result
     setProjectsList(projectsList)
   }
   const fetchErrors = async () => {
     const { data: result } = await axios.post('/projects/errors')
-    if (!result.success) return
+    if (!result.success) return console.error(result.error || result);
 
     const { errorsList } = result
     setErrorsList(errorsList)
@@ -75,8 +75,12 @@ const ErrorsPage = () => {
   };
 
   const [open, setOpen] = useState(false)
+  const [openType, setOpenType] = useState(false)
   const handleModalOpen = () => setOpen(true)
-  const handleModalClose = () => setOpen(false)
+  const handleModalClose = () => {
+    setOpen(false)
+    setOpenType(null)
+  }
 
   const [elemOnRemove, setElemOnRemove] = useState(null)
   const [remember, setRemember] = useState(null)
@@ -93,13 +97,33 @@ const ErrorsPage = () => {
     else handleModalOpen()
   }
 
+  const removeAllError = () => {
+    setOpenType('all')
+    handleModalOpen()
+  }
+
   const comfirmRemove = async (elem) => {
     const remove = elem || elemOnRemove
     if (!remove) return
 
     if (remember) setAutoErrorRemoval()
 
-    await axios.post('/projects/error/remove', { id: remove.id })
+    const { data: result } = await axios.post('/projects/error/remove', { id: remove.id })
+    if (!result.success) return console.error(result.error || result);
+    
+    fetchErrors()
+    handleModalClose()
+  }
+
+  const comfirmRemoveAll = async () => {
+    let filter = {}
+
+    if (selectedProject === 'others') filter = { others: true }
+    else  filter = { id: selectedProject }
+
+    const { data: result } = await axios.post('/projects/error/removeAll', filter)
+    if (!result.success) return console.error(result.error || result);
+    
     fetchErrors()
     handleModalClose()
   }
@@ -154,8 +178,15 @@ const ErrorsPage = () => {
         maxHeight: '100%',
         overflow: 'hidden',
         display: 'grid',
-        gridTemplateRows: '1fr auto'
+        gridTemplateRows: 'auto 1fr auto'
       }}>
+        <Button
+          sx={{ justifySelf: 'end' }}
+          startIcon={<Delete />}
+          variant="contained"
+          color="error"
+          onClick={removeAllError}
+        >Remove all{selectedProject ? ` from ${projectsList.find(el => el._id === selectedProject)?.name || 'others'}` : ''}</Button>
 
         <TableContainer>
           <Table size="small" stickyHeader aria-label="sticky table" >
@@ -229,13 +260,27 @@ const ErrorsPage = () => {
       open={open}
       onClose={handleModalClose}
       onCancel={handleModalClose}
-      onSubmit={() => comfirmRemove()}
+      onSubmit={() => {
+        if (openType === 'all') comfirmRemoveAll()
+        else comfirmRemove()
+      }}
     >
-      <div>Remove <b>{elemOnRemove?.project || `"${elemOnRemove?.message}"`}</b> error?</div>
-      <FormControlLabel sx={{ mt: 1 }}
-        label="Don`t ask for removal within 1 hour"
-        control={<Checkbox checked={remember} onChange={() => setRemember(!remember)} />}
-      />
+      {openType === 'all'
+      ? <>
+        {
+          selectedProject ? <div>Remove all{selectedProject ? ` from ${projectsList.find(el => el._id === selectedProject)?.name || 'others'}` : ''}</div>
+          : <div>Remove ALL errors</div>
+        }
+      </>
+      : <>
+        <div>Remove <b>{elemOnRemove?.project || `"${elemOnRemove?.message}"`}</b> error?</div>
+        <FormControlLabel sx={{ mt: 1 }}
+          label="Don`t ask for removal within 1 hour"
+          control={<Checkbox checked={remember} onChange={() => setRemember(!remember)} />}
+        />
+      </>
+      }
+      
     </Modal>
   </Layout>
 }

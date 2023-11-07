@@ -1,7 +1,9 @@
 import { Autorenew, Save as SaveIcon } from '@mui/icons-material';
-import { Box, Button, FormControl,
+import {
+  Box, Button, FormControl,
+  FormControlLabel,
   Grid, IconButton, InputLabel,
-  MenuItem, OutlinedInput, TextField, Typography
+  MenuItem, OutlinedInput, Switch, TextField, Typography
 } from '@mui/material';
 
 import axios from '../../tools/axios';
@@ -44,6 +46,7 @@ const AddProject = () => {
   const [type, setType] = useState(types[0].value)
   const [formData, setFormData] = useState({})
   const [formErrors, setFormErrors] = useState({})
+  const [noExtraTime, setNoExtraTime] = useState(false)
 
   const checkData = (data) => {
     const errors = {}
@@ -55,7 +58,7 @@ const AddProject = () => {
 
     if (!data.token) data.token = token || generateToken()
 
-    if (Object.keys(errors).length){
+    if (Object.keys(errors).length) {
       setFormErrors(errors)
       return
     }
@@ -66,6 +69,7 @@ const AddProject = () => {
       description: data.description,
       token: data.token,
       reloadTime: data.reloadTime,
+      noExtraTime: noExtraTime,
       requestLink: type === 'website' ? data.requestLink : '',
       link: data.link,
       telegram: {
@@ -77,7 +81,10 @@ const AddProject = () => {
   }
   const onSubmit = async () => {
     const { data: result } = await axios.post('/projects/create', formData)
-    if (!result.success) return handleClose()
+    if (!result.success) {
+      console.error(result.error || result);
+      return handleClose()
+    }
 
     router.back()
   }
@@ -92,14 +99,14 @@ const AddProject = () => {
         gridTemplateRows: '1fr auto',
         gap: 1,
       }}
-    > 
+    >
       <form style={{ heigth: '100%' }}>
         <Grid container spacing={6} alignItems="flex-start" justifyContent='start'>
           <Grid container spacing={2} item md={6} sm={12}>
             <Grid item xs={12}><Typography variant="h5">Main info</Typography></Grid>
 
             <Grid item xs={6}>
-              <Input name="name" label="Project name" error={formErrors.name} helperText={formErrors.name}/>
+              <Input name="name" label="Project name" error={formErrors.name} helperText={formErrors.name} />
             </Grid>
             <Grid item xs={6}>
               <Input name="type" label="Type" select value={type}
@@ -114,7 +121,7 @@ const AddProject = () => {
               </Input>
             </Grid>
             <Grid item xs={12}>
-              <Input name="link" label="Link"/>
+              <Input name="link" label="Link" />
             </Grid>
             <Grid item xs={12} >
               <Input name="description" label="Description"
@@ -142,10 +149,15 @@ const AddProject = () => {
                 />
               </FormControl>
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={2}>
               <Input name='reloadTime' label="Reload time" type="number"
                 error={formErrors.reloadTime} helperText={formErrors.reloadTime}
               />
+            </Grid>
+            <Grid item xs={2}>
+              <FormControlLabel
+                control={<Switch checked={!noExtraTime} onChange={e => setNoExtraTime(!e.target.checked)} />}
+                label="+10 min" />
             </Grid>
 
             {
@@ -158,10 +170,10 @@ const AddProject = () => {
             <Grid item xs={12}><Typography variant="p">Telegram</Typography></Grid>
 
             <Grid item xs={6}>
-              <Input name='telegramToken' label="Bot token"/>
+              <Input name='telegramToken' label="Bot token" />
             </Grid>
             <Grid item xs={6}>
-              <Input name='telegramChat' label="Chat link"/>
+              <Input name='telegramChat' label="Chat link" />
             </Grid>
           </Grid>
         </Grid>
@@ -172,7 +184,7 @@ const AddProject = () => {
         justifyContent: 'flex-end',
         gap: 1,
       }}>
-        <Button onClick={handleSubmit(checkData)}><SaveIcon/></Button>
+        <Button onClick={handleSubmit(checkData)}><SaveIcon /></Button>
       </Box>
     </Box>
 

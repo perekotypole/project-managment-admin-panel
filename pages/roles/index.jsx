@@ -23,14 +23,14 @@ const RolesPage = () => {
 
   const fetchRoles = async () => {
     const { data: result } = await axios.post('/roles')
-    if (!result.success) return
+    if (!result.success) return console.error(result.error || result);
 
     const { rolesList: data } = result
     setRolesList(data)
   }
   const fetchRoleDetail = async () => {
     const { data: result } = await axios.post('/roles/getOne', { id: selectedRole })
-    if (!result.success) return
+    if (!result.success) return console.error(result.error || result);
 
     const { role } = result
     setRoleDetails(role)
@@ -69,7 +69,9 @@ const RolesPage = () => {
       return
     }
 
-    await axios.post('/roles/remove', { id: elemOnRemove._id })
+    const { data: result } = await axios.post('/roles/remove', { id: elemOnRemove._id })
+    if (!result.success) return console.error(result.error || result);
+
     fetchRoles()
 
     setRoleDetails(null)

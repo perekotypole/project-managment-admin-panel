@@ -38,14 +38,14 @@ const UsersPage = () => {
 
   const fetchUsers = async () => {
     const { data: result } = await axios.post('/users')
-    if (!result.success) return
+    if (!result.success)  return console.error(result.error || result);
 
     const { usersList: data } = result
     setUsersList(data)
   }
   const fetchUserDetail = async () => {
     const { data: result } = await axios.post('/users/getOne', { id: selectedUser })
-    if (!result.success) return
+    if (!result.success)  return console.error(result.error || result);
 
     const { user, projects } = result
     setUserDetails({
@@ -93,7 +93,9 @@ const UsersPage = () => {
       return
     }
 
-    await axios.post('/users/remove', { id: elemOnRemove._id })
+    const { data: result } = await axios.post('/users/remove', { id: elemOnRemove._id })
+    if (!result.success)  return console.error(result.error || result);
+
     fetchUsers()
 
     setUserDetails(null)
@@ -103,11 +105,12 @@ const UsersPage = () => {
   }
 
   const saveChanged = async () => {
-    await axios.post('/users/updateSelectedData', {
+    const { data: result } = await axios.post('/users/updateSelectedData', {
       id: selectedUser,
       status: selectedStatus,
       project: selectedProject,
     })
+    if (!result.success)  return console.error(result.error || result);
     
     setUserDetails({
       ...userDetails,
@@ -211,10 +214,10 @@ const UsersPage = () => {
               <b>Login: </b>
               <CopyText>{userDetails.login}</CopyText>
             </Typography>
-            <Typography variant='body2'>
+            {/* <Typography variant='body2'>
               <b>Password: </b>
               <CopyText>{userDetails.password}</CopyText>
-            </Typography>
+            </Typography> */}
           </Box>
 
           {userDetails.baseUser && <Typography variant='body2'><i>(Base user for initial management)</i></Typography>}

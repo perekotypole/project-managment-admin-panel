@@ -85,7 +85,6 @@ const Projects = () => {
 
     setProjectDetails(rows.find(el => el.id === selectedProject))
   }, [selectedProject]);
-  console.log(projectDetails);
 
   const [filter, setFilter] = useState();
   const filterList = useMemo(() => filter
@@ -96,7 +95,7 @@ const Projects = () => {
 
   const fetchData = async () => {
     const { data: result } = await axios.post('/projects')
-    if (!result.success) return
+    if (!result.success) return console.error(result.error || result);
 
     const { projectsList } = result
     setData(projectsList)
@@ -136,7 +135,9 @@ const Projects = () => {
       return
     }
 
-    await axios.post('/projects/remove', { id: elemOnRemove.id })
+    const { data: result } = await axios.post('/projects/remove', { id: elemOnRemove.id })
+    if (!result.success) return console.error(result.error || result);
+
     fetchData()
     handleModalClose()
   }
@@ -301,7 +302,7 @@ const Projects = () => {
             <Divider sx={{ my: 1 }} />
 
             <Typography variant='subtitle1'><b>Telegram</b></Typography>
-            <Typography variant='subtitle2'><b>Token:</b> <CopyText>{projectDetails.telegram?.token}</CopyText></Typography>
+            <Typography variant='subtitle2'><b>Token:</b> <CopyText hideText={'***'}>{projectDetails.telegram?.token}</CopyText></Typography>
             <Typography variant='subtitle2'><b>Chat:</b> <CopyText>{projectDetails.telegram?.chat}</CopyText></Typography>
           </>}
         </Box>}

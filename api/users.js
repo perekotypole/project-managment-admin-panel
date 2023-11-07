@@ -125,7 +125,11 @@ router.post('/edit', dataAccess, async (req, res) => {
     const { id, userData } = req.body
     if (!id) return res.json({ error: 'User ID is required' })
   
-    await User.findByIdAndUpdate(id, userData)
+    const user = await User.findById(id)
+    await User.findByIdAndUpdate(id, {
+      ...userData,
+      password: userData.password || user.password
+    })
 
     return res.json({ 
       success: true,

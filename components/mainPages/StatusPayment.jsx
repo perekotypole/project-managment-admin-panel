@@ -2,7 +2,7 @@ import Layout from '../Layout';
 
 const StatusPayment = () => {
   return <Layout noheader>
-    {'Payment'}
+    {'Заглушка (сюди скажеш які сторінки створбвати)'}
   </Layout>
 }
 

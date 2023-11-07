@@ -20,3 +20,16 @@ export const getAutoErrorRemoval = (key = 'autoRemoval') => {
   }
   return item
 }
+
+export const formatDate = (date, onlytime = false) => {
+  const addZero = (n) => (n < 10) ? `0${n}` : `${n}`
+
+  const day = addZero(date.getDate())
+  const month = addZero(date.getMonth() + 1)
+  const hours = addZero(date.getHours())
+  const minutes = addZero(date.getMinutes())
+  const seconds = addZero(date.getSeconds())
+
+  if (onlytime) return `${hours}:${minutes}:${seconds}`
+  return `${day}/${month} ${hours}:${minutes}:${seconds}`
+}

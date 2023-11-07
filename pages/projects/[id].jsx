@@ -1,7 +1,8 @@
 import { Autorenew, Save as SaveIcon } from '@mui/icons-material';
 import { Box, Button, FormControl,
+  FormControlLabel,
   Grid, IconButton, InputLabel,
-  MenuItem, OutlinedInput, TextField, Typography
+  MenuItem, OutlinedInput, Switch, TextField, Typography
 } from '@mui/material';
 
 import axios from '../../tools/axios';
@@ -46,15 +47,20 @@ const EditProject = () => {
   const [type, setType] = useState(types[0].value)
   const [formData, setFormData] = useState({})
   const [formErrors, setFormErrors] = useState({})
+  const [noExtraTime, setNoExtraTime] = useState(false)
 
   const fetchData = async (id) => {
     const { data: result } = await axios.post('/projects/getOne', { id })
-    if (!result.success) return handleClose()
+    if (!result.success) {
+      console.error(result.error || result);
+      return handleClose()
+    }
 
     const { project: data } = result
     setFormData(data)
     setToken(data.token)
     setType(data.type)
+    setNoExtraTime(!!data.noExtraTime)
   }
   const checkData = (data) => {
     const errors = {}
@@ -77,6 +83,7 @@ const EditProject = () => {
       description: data.description,
       token: data.token,
       reloadTime: data.reloadTime,
+      noExtraTime: noExtraTime,
       requestLink: type === 'website' ? data.requestLink : '',
       link: data.link,
       telegram: {
@@ -86,9 +93,13 @@ const EditProject = () => {
     })
     handleOpen()
   }
+  
   const onSubmit = async () => {
     const { data: result } = await axios.post('/projects/edit', { id, projectData: formData })
-    if (!result.success) return handleClose()
+    if (!result.success) {
+      console.error(result.error || result);
+      return handleClose()
+    }
 
     router.back()
   }
@@ -103,6 +114,7 @@ const EditProject = () => {
 
     setLoading(false)
     setToken(formData.token)
+    setNoExtraTime(!!formData.noExtraTime)
   }, [formData]);
 
   return <Layout>
@@ -167,10 +179,15 @@ const EditProject = () => {
                     />
                   </FormControl>
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item xs={2}>
                   <Input name='reloadTime' label="Reload time" type="number" defaultValue={formData.reloadTime}
                     error={formErrors.reloadTime} helperText={formErrors.reloadTime}
                   />
+                </Grid>
+                <Grid item xs={2}>
+                  <FormControlLabel
+                  control={<Switch checked={!noExtraTime} onChange={e => setNoExtraTime(!e.target.checked)} />}
+                  label="+10 min" />
                 </Grid>
 
                 {

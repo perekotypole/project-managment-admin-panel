@@ -60,7 +60,7 @@ const EditRole = () => {
 
   const fetchData = async () => {
     const { data: result } = await axios.post('/roles/getOne', { id })
-    if (!result.success) return
+    if (!result.success) return console.error(result.error || result);
 
     const { role } = result
 
@@ -77,7 +77,7 @@ const EditRole = () => {
 
   const fetchLists = async () => {
     const { data: result } = await axios.post('/roles/getAllContent')
-    if (!result.success) return
+    if (!result.success) return console.error(result.error || result);
 
     const { projects, blocks, pages } = result
     setProjectsList(projects)
@@ -112,7 +112,10 @@ const EditRole = () => {
 
   const onSubmit = async () => {
     const { data: result } = await axios.post('/roles/edit', { id, roleData: formData })
-    if (!result.success) return handleClose()
+    if (!result.success) {
+      console.error(result.error || result);
+      return handleClose()
+    }
 
     router.back()
   }

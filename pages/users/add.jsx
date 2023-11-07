@@ -20,6 +20,7 @@ import { generateToken } from '../../tools/functions';
 import Layout from '../../components/Layout';
 import Modal from '../../components/Modal';
 import Role from '../../components/Role';
+import md5 from 'md5';
 
 const AddRole = () => {
   const router = useRouter()
@@ -52,7 +53,7 @@ const AddRole = () => {
 
   const fetchData = async () => {
     const { data: result } = await axios.post('/roles')
-    if (!result.success) return
+    if (!result.success)  return console.error(result.error || result);
 
     const { rolesList } = result
     setRolesList(rolesList)
@@ -70,7 +71,7 @@ const AddRole = () => {
 
     if (!data.username) errors.username = 'Userame is required'
     if (!data.login) errors.login = 'Login is required'
-    if (!data.password) data.password = setPassword(generateToken(12))
+    // if (!data.password) data.password = setPassword(generateToken(12))
 
     if (Object.keys(errors).length) {
       setFormErrors(errors)
@@ -81,7 +82,7 @@ const AddRole = () => {
       username: data.username,
       description: data.description,
       login: data.login,
-      password: password,
+      password: md5(password),
       rolesID: selectedRoles,
     })
     handleOpen()
@@ -89,7 +90,10 @@ const AddRole = () => {
 
   const onSubmit = async () => {
     const { data: result } = await axios.post('/users/create', formData)
-    if (!result.success) return handleClose()
+    if (!result.success) {
+      console.error(result.error || result);
+      return handleClose()
+    }
 
     router.back()
   }

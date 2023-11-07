@@ -1,7 +1,7 @@
 import { Box, Button, ClickAwayListener, Tooltip, Zoom } from '@mui/material';
 import { useState } from 'react';
 
-const CopyText = ({ children }) => {
+const CopyText = ({ children, hideText }) => {
   const [open, setOpen] = useState(false);
   const handleTooltipClose = () => setOpen(false)
   const handleTooltipOpen = () => {
@@ -39,7 +39,7 @@ const CopyText = ({ children }) => {
             }
           }}
         >
-          {children}
+          {hideText || children}
         </Button>
       </Tooltip>
   </ClickAwayListener>

@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { Session, User, } from './models/index.js'
+import { Project, Role, Session, User, } from './models/index.js'
 import { generateToken } from './helpers/index.js'
 import { verifyUser } from './middleware/index.js'
 
@@ -32,7 +32,6 @@ router.post('/login', async (req, res) => {
     const additionalData = {
       ip: req.ip,
       useragent: req.headers['user-agent'],
-      requestedWith: req.headers['x-requested-with'],
       acceptLanguage: req.headers['accept-language'],
     }
   
@@ -62,23 +61,24 @@ router.post('/logout', verifyUser, async (req, res) => {
   }
 })
 
-router.post('/remoteAuth', verifyUser, async (req, res) => {
+router.post('/remoteAuth', async (req, res) => {
   try {
-    const projectToken = req.projectToken
-    const additionalData = {
-      ip: req.ip,
-      useragent: req.headers['user-agent'],
-      requestedWith: req.headers['x-requested-with'],
-      acceptLanguage: req.headers['accept-language'],
-    }
+    const projectToken = req.body.projectToken
+    // const additionalData = {
+    //   ip: req.ip,
+    //   useragent: req.headers['user-agent'],
+    //   acceptLanguage: req.headers['accept-language'],
+    // }
+    const additionalData = req.body.additionalData
     
     const authData = await Session.findOne({ additionalData })
     if (!authData) return res.json({ access: false })
   
     const user = await User.findById(authData.userID)
-    const { access } = user
+    const projectsIDs = await Role.find({ _id: { $in: user.rolesID } }).distinct('access')
+    const project = await Project.findOne({ _id: { $in: projectsIDs }, token: projectToken })
   
-    return res.json({ access: access.includes(projectToken) })
+    return res.json({ access: !!project })
 
   } catch (error) {
     console.error('/auth/remoteAuth => ', error)

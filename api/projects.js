@@ -204,4 +204,33 @@ router.post('/error/remove', dataAccess, async (req, res) => {
   }
 })
 
+router.post('/error/removeAll', dataAccess, async (req, res) => {
+  try {
+    const access = req.content.map(({slug}) => slug).includes(accessSlug)
+    if (!access) {
+      res.redirect('/')
+      return
+    }
+
+    const { id, others } = req.body
+
+    if (id) {
+      await Error.deleteMany({ projectID: id })
+    } else if (others) {
+      const projects_ids = await Project.find({}).distinct('_id')
+      await Error.deleteMany({ projectID: { $nin: projects_ids } })
+    } else {
+      await Error.deleteMany({})
+    }
+
+    return res.json({ 
+      success: true,
+    })
+    
+  } catch (error) {
+    console.error('/projects/error/remove => ', error)
+    return res.json({ error })
+  }
+})
+
 export default router

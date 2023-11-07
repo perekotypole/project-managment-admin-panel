@@ -52,6 +52,7 @@ export const Project = mongoose.model('Project', {
   
   token: { type: String, unique: true },
   requestLink: { type: String },
+  noExtraTime: { type: Boolean, default: () => false },
   reloadTime: { type: Number },
   checkDate: { type: Date },
   telegram: {
@@ -63,7 +64,14 @@ export const Project = mongoose.model('Project', {
 });
 
 export const Error = mongoose.model('Error', {
-  projectID: { type: Object },
+  projectID: { type: mongoose.Types.ObjectId },
   message: { type: String },
   createdAt: { type: Date, default: () => new Date() },
 });
+
+export const Resources = mongoose.model('Resources', {
+  cpu: { type: Number },
+  memory: { type: Number },
+  network: { type: Number },
+  createdAt: { type: Date, default: () => new Date() },
+}, 'resources');

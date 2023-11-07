@@ -10,7 +10,7 @@ const Project = () => {
 
   const fetchProject = async (id) => {
     const { data: result } =  await axios.post('/access/project', { id })
-    if (!result.success) return
+    if (!result.success) return console.error(result.error || result);
 
     setProject(result.project)
   }

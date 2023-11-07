@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import axios from '../tools/axios';
 import { TextField, Button, Box } from '@mui/material';
 import LoginLayout from '../components/LoginLayout';
+import md5 from 'md5';
 
 const Login = () => {
   const router = useRouter();
@@ -19,8 +20,8 @@ const Login = () => {
     
     setError({})
 
-    const { data: result } = await axios.post('/auth/login', { login, password })
-    if (result?.success) return router.push('/');
+    const { data: result } = await axios.post('/auth/login', { login, password: md5(password) })
+    if (result?.success) return router.reload();
 
     return setError(result?.error || { global: 'Unknown error' })
   }

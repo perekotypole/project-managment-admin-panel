@@ -102,8 +102,8 @@ export const mainPageRedirect = async (user, currentParams) => {
 
   if (user.startedProject) return { project: user.startedProject.toString() }
 
-  const blocks = await Role.find({ _id: { $in: user.rolesID }}).distinct('blocks')
-  if (blocks.length) return { blocks: blocks.map(el => el.toString()).toString() }
+  // const blocks = await Role.find({ _id: { $in: user.rolesID }}).distinct('blocks')
+  // if (blocks.length) return { blocks: blocks.map(el => el.toString()).toString() }
 
   return {}
 }

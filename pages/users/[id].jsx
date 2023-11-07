@@ -20,6 +20,7 @@ import { generateToken } from '../../tools/functions';
 import Layout from '../../components/Layout';
 import Modal from '../../components/Modal';
 import Role from '../../components/Role';
+import md5 from 'md5';
 
 const EditUser = () => {
   const router = useRouter()
@@ -56,7 +57,7 @@ const EditUser = () => {
 
   const fetchData = async () => {
     const { data: result } = await axios.post('/users/getOne', { id })
-    if (!result.success) return
+    if (!result.success)  return console.error(result.error || result);
 
     const { user } = result
 
@@ -64,7 +65,6 @@ const EditUser = () => {
     setFormData({
       username: user.username,
       login: user.login,
-      password: user.password,
       description: user.description,
       rolesID: user.rolesID.map(el => el._id),
     })
@@ -72,7 +72,7 @@ const EditUser = () => {
 
   const fetchRoles = async () => {
     const { data: result } = await axios.post('/roles')
-    if (!result.success) return
+    if (!result.success)  return console.error(result.error || result);
 
     const { rolesList } = result
     setRolesList(rolesList)
@@ -86,7 +86,7 @@ const EditUser = () => {
 
     if (!data.username) errors.username = 'Userame is required'
     if (!data.login) errors.login = 'Login is required'
-    if (!data.password) data.password = setPassword(generateToken(12))
+    // if (!data.password) data.password = setPassword(generateToken(12))
 
     if (Object.keys(errors).length) {
       setFormErrors(errors)
@@ -97,7 +97,7 @@ const EditUser = () => {
       username: data.username,
       description: data.description,
       login: data.login,
-      password: password,
+      password: password ? md5(password) : null,
       rolesID: selectedRoles,
     })
     handleOpen()
@@ -105,7 +105,10 @@ const EditUser = () => {
 
   const onSubmit = async () => {
     const { data: result } = await axios.post('/users/edit', { id, userData: formData })
-    if (!result.success) return handleClose()
+    if (!result.success) {
+      console.error(result.error || result);
+      return handleClose()
+    }
 
     router.back()
   }
@@ -122,7 +125,7 @@ const EditUser = () => {
 
     setLoading(false)
 
-    setPassword(formData.password)
+    // setPassword(formData.password)
     setSelectedRoles(formData.rolesID)
   }, [formData]);
 

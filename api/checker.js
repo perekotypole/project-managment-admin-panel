@@ -23,7 +23,37 @@ const setTimeoutForWaiting = (project) => setTimeout(() => {
     chatID: project.telegram?.chat,
     message: `🆘 [ ${project.name || 'Unknown project'} ]: Connection check timed out` ,
   })
-}, reserveTime + project.reloadTime * 1000)
+}, project.noExtraTime ? project.reloadTime * 1000 : reserveTime + project.reloadTime * 1000)
+
+const request = async (project) => {
+  try {
+    await axios.get(project.requestLink)
+    return 1
+
+  } catch (error) {
+    if (project.status === false) return -1
+    return 0
+  }
+}
+
+const repeatRequest = async (project) => {
+  await new Promise(resolve => setTimeout(async () => {
+    try {
+      await axios.get(project.requestLink)
+      resolve(1)
+    } catch (error) {
+      console.error(`[${project.requestLink}]: ${error}`);
+      setBadStatus(project._id)
+      sendMessage({
+        token: project.telegram?.token,
+        chatID: project.telegram?.chat,
+        message: `🆘 [ ${project.name || 'Unknown project'} ]: Connection check timed out` ,
+      })
+      resolve(0)
+    }
+
+  }, 10000))
+}
 
 const setTimeoutForRequest = async ({ _id, token }) => {
   if (!_id || !token) return makingRequests[token] = null
@@ -32,19 +62,10 @@ const setTimeoutForRequest = async ({ _id, token }) => {
     const project = await Project.findById(_id)
     if (!project) return makingRequests[token] = null
 
-    try {
-      await axios.get(project.requestLink)
-    } catch (error) {
-      if (project.status !== false) {
-        setBadStatus(project._id)
-        sendMessage({
-          token: project.telegram?.token,
-          chatID: project.telegram?.chat,
-          message: `🆘 [ ${project.name || 'Unknown project'} ]: Connection check timed out` ,
-        })
-      }
-
-      return
+    const success = await request(project)
+    if (!success) {
+      const successRepeaat = await repeatRequest(project)
+      if (!successRepeaat) return
     }
 
     if (project.status === false) {
@@ -78,12 +99,10 @@ export const checkerRemoveProject = (token) => {
   if (makingRequests[token]) makingRequests[token] = null
 }
 
-// Init timers
-;(async () => {
+export const initTimers = async (token) => {
   try {
     await Project.updateMany({}, { status: null })
     const projects = await Project.find({})
-  
     projects.forEach((project) => checkerAddProject(project))
     
   } catch (error) {
@@ -95,7 +114,7 @@ export const checkerRemoveProject = (token) => {
   //   console.log(Object.keys(waitingRequests).map(el => 
   //     [el, !waitingRequests[el]._destroyed]));
   // }, 5000);
-})()
+}
 
 router.get('/', async (req, res) => {
   try {

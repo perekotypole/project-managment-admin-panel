@@ -6,11 +6,12 @@ import next from 'next'
 import cors from 'cors'
 import session from 'express-session'
 import MongoStore from 'connect-mongo'
+import bodyParser from 'body-parser'
 
 import api from './api/index.js'
 import { checkInitData, database } from './api/helpers/index.js'
 import { verifyUser, pageAccess } from './api/middleware/index.js'
-import bodyParser from 'body-parser'
+import { initTimers } from './api/checker.js'
 
 const dev = process.env.NODE_ENV !== 'production'
 const hostname = 'localhost'
@@ -19,12 +20,15 @@ const app = next({ dev, hostname, port })
 const handle = app.getRequestHandler()
 
 const secret = process.env.SECRET || 'secret'
-const DBUrl = `mongodb://localhost/${process.env.DATABASE || 'adminpanel'}`
+const DBUrl = `${process.env.DB_URI || 'mongodb://0.0.0.0:27017/'}${process.env.DATABASE || 'adminpanel'}?authSource=admin`
+
+console.log(DBUrl);
 
 database(DBUrl)
   .then(async () => {
     console.info('Database is connected')
     await checkInitData()
+    await initTimers()
   })
   .catch((ex) => {
     console.error(ex.stack)

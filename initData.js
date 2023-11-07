@@ -1,6 +1,8 @@
 import * as dotenv from 'dotenv'
 dotenv.config()
 
+import md5 from 'md5'
+
 export const contentBlocks = [
   {
     title: 'Resources monitoring',
@@ -25,6 +27,10 @@ export const contentPage = [
     title: 'Errors manager',
     slug: 'errors',
   },
+  {
+    title: 'MongoDB',
+    slug: 'mongodb',
+  },
 ]
 
 export const existPaths = [
@@ -36,7 +42,7 @@ export const existPaths = [
 export const admin = {
   username: 'admin',
   login: process.env.ADMIN_LOGIN || 'admin',
-  password: process.env.INIT_PASS || 'password',
+  password: md5(process.env.INIT_PASS || 'password'),
 }
 
 export default {

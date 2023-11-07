@@ -1,7 +1,11 @@
 import { Box } from '@mui/material';
-import { useState, useMemo } from 'react';
+import axios from 'axios';
+import { useState, useMemo, useEffect } from 'react';
 
 const Iframe = ({ src }) => {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [fullScreen, setFullScreen] = useState(true);
   const styles = useMemo(() => fullScreen ? ({
     position: 'absolute',
@@ -13,11 +17,35 @@ const Iframe = ({ src }) => {
     boxShadow: 3,
   }), [fullScreen])
 
+  // const trySrc = async () => {
+  //   try {
+  //     await axios.get(src, {
+  //       validateStatus: function (status) {
+  //         return status < 500; // Resolve only if the status code is less than 500
+  //       }
+  //     })
+  //   } catch (error) {
+  //     console.log(error.toJSON())
+  //     setError('Unable to load page')
+  //   }
+
+  //   setLoading(false)
+  // }
+
+  // useEffect(() => {
+  //   if (!loading) return
+  //   trySrc()
+  // }, []);
+
+  // if (loading) return <>Loading</>
+  // if (error) return <>{error}</>
+
   return <Box
     sx={{
       width: '100%',
       height: '100%',
       overflow: 'hidden',
+      backgroundColor: '#fff',
       ...styles,
     }}
   >

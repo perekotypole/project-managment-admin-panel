@@ -25,14 +25,14 @@ const Header = ({ onlyLogout = false }) => {
 
   const fetchUser = async () => {
     const { data: result } = await axios.post('/access/user')
-    if (!result?.success) return
+    if (!result?.success) return console.error(result.error || result);
 
     setUser(result.user)
   }
 
   const getPages = async () => {
     const { data: result } = await axios.post('/access/getPages')
-    if (!result?.success) return
+    if (!result?.success) return console.error(result.error || result);
 
     setAccessPages(result.pages)
     setProjectsLinks(result.projects)
@@ -45,7 +45,8 @@ const Header = ({ onlyLogout = false }) => {
 
   const onLogout = async () => {
     const { data: result } = await axios.post('/auth/logout',)
-    if (result?.success) return router.push('/login');
+    if (!result?.success) return console.error(result.error || result);
+    return router.push('/login');
   }
 
   const NavLink = ({children, active, sx, ...prors}) => <Link

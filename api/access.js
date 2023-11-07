@@ -42,7 +42,7 @@ router.post('/getPages', dataAccess, async (req, res) => {
 
 router.post('/getBlocks', dataAccess, async (req, res) => {
   try {
-    const blocks = await Content.find({ _id: { $in: accessContent }, type: 'block'})
+    const blocks = await Content.find({ _id: { $in: req.blocksIDs } })
   
     return res.json({ 
       success: true,
