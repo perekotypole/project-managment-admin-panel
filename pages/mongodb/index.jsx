@@ -1,14 +1,13 @@
 import axios from "../../tools/axios";
 import { useEffect, useMemo, useState } from "react";
 import {
-  Box, Button, Checkbox, Chip, Divider, IconButton, Link, List, ListItem,
+  Box, Button, Chip, Divider, IconButton, Link, List, ListItem,
   ListItemButton, Paper, Stack, TextField, Typography
 } from "@mui/material"
 import { Add, Delete, Edit, Replay } from "@mui/icons-material";
 
 import Layout from "../../components/Layout"
 import Modal from "../../components/Modal";
-import Role from "../../components/Role";
 import CopyText from '../../components/CopyText';
 
 const DBUsersPage = () => {
@@ -25,8 +24,10 @@ const DBUsersPage = () => {
   
   const [filter, setFilter] = useState();
   const filterList = useMemo(() => filter
-    ? usersList.filter(({ title }) => title.toLowerCase().indexOf(filter.toLowerCase()) !== -1)
-    : usersList
+    ? usersList.filter(({ title = null }) => {
+      if (!title) return false
+      return title.toLowerCase().indexOf(filter.toLowerCase()) !== -1
+    }) : usersList
   , [usersList, filter])
 
   const fetchUsers = async () => {
@@ -96,7 +97,7 @@ const DBUsersPage = () => {
         gridTemplateRows: 'auto 1fr auto',
         gap: 1,
       }}>
-        <TextField size="small" variant="outlined"  fullWidth
+        <TextField size="small" variant="outlined" fullWidth
           label="Search" onChange={(e) => setFilter(e.target.value)} />
 
         <Box sx={{

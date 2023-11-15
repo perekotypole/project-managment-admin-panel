@@ -26,8 +26,6 @@ router.post('/', dataAccess, async (req, res) => {
 
     const { users } = await db.command({ usersInfo: 1 });
 
-    console.log(client.options);
-
     res.json({
       success: true,
       users,
