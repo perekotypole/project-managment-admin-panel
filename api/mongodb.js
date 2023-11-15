@@ -5,6 +5,8 @@ import { Router } from 'express'
 import { MongoClient } from 'mongodb';
 import { dataAccess } from './middleware/index.js'
 
+import ip from "ip"
+
 const router = Router()
 const accessSlug = 'mongodb'
 
@@ -29,7 +31,8 @@ router.post('/', dataAccess, async (req, res) => {
     res.json({
       success: true,
       users,
-      host: client.options.hosts[0].toString()
+      host: ip.address(),
+      port: client.options.hosts[0].toString()?.split(':')?.[1],
     })
   } catch (error) {
     console.error('/mongodb => ', error)

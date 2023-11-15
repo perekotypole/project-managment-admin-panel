@@ -34,10 +34,10 @@ const DBUsersPage = () => {
     const { data: result } = await axios.post('/mongodb')
     if (!result.success) return console.error(result.error || result);
 
-    const { users: data, host } = result
+    const { users: data, host, port } = result
     setUsersList(data)
-    setDBHost(host)
   }
+  console.log(DBHost);
   useEffect(() => {
     if (!usersList.length) fetchUsers()
   }, []);
@@ -141,7 +141,8 @@ const DBUsersPage = () => {
             </Stack>
           </Stack>
 
-          <CopyText hideText="Copy connection link">{`mongodb://${userDetails.user}:${userDetails.password}@${DBHost}/`}</CopyText>
+          <CopyText hideText="Copy remote connection link">{`mongodb://${userDetails.user}:${userDetails.password}@${DBHost?.[0]}:${DBHost?.[1]}/`}</CopyText>
+          <CopyText hideText="Copy local connection link">{`mongodb://${userDetails.user}:${userDetails.password}@0.0.0.0:${DBHost?.[1]}`}</CopyText>
 
           { userDetails.description && <>
             <Typography variant='body2'><i>Description</i>: {userDetails.description}</Typography>
