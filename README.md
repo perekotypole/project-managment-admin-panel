@@ -1,5 +1,20 @@
 ## Admin panel for project managment
 
+
+
+**Features**
+- Projects Management
+- User Management
+- User Roles
+- Real-time server resource charts
+- Error catchers (errors from other projects) 
+- Telegram notification
+- Access to other web projects through the client application
+- Customized default home page for different users
+- Check if projects are alive
+- Create MongoDB access links
+
+
 **Run**
 
 1. Clone:

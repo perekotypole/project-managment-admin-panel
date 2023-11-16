@@ -37,7 +37,7 @@ const DBUsersPage = () => {
     const { users: data, host, port } = result
     setUsersList(data)
   }
-  console.log(DBHost);
+  
   useEffect(() => {
     if (!usersList.length) fetchUsers()
   }, []);
