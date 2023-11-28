@@ -11,6 +11,9 @@ import { verifyUser } from './middleware/index.js'
 import { sendMessage } from './helpers/telegram.js'
 
 process.on('uncaughtException', err => {
+  console.error('Critical error:');
+  console.error(err);
+  
   sendMessage({
     token: null,
     chatID: null,
