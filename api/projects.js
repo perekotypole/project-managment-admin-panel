@@ -24,7 +24,10 @@ router.post('/', dataAccess, async (req, res) => {
       })
     )
 
-    for (let i = 0, end_index = list.length - 1; i < end_index;) {
+    for (let i = 0,
+      end_index = list.length - 1,
+      non_working_index = 0;
+    i <= end_index;) {
       const el = list[i]
 
       if (el?.stopped) {
@@ -36,10 +39,11 @@ router.post('/', dataAccess, async (req, res) => {
 
       if (!el?.status) {
         list.splice(i, 1)
-        list.unshift(el)
-        i++
-        continue
+        list.splice(non_working_index, 0, el);
+        non_working_index++
       }
+
+      i++
     }
 
     return res.json({ 

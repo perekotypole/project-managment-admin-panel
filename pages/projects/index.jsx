@@ -226,7 +226,7 @@ const Projects = () => {
                       }
               
                       if (column.id === 'running') {
-                        return <TableCell sx={{ padding: 0, textAlign: 'center' }}>
+                        return <TableCell key={column.id} sx={{ padding: 0, textAlign: 'center' }}>
                           <Switch key={`running-${row.id}`} defaultChecked={!row?.stopped} onChange={() => runningStatusToggle(row.id)} />
                         </TableCell>
                       }
