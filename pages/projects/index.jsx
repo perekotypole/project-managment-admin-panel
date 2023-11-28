@@ -8,12 +8,12 @@ import {
   Box,
   IconButton,
   Button,
-  Collapse,
   Paper,
   Stack,
   Typography,
   TextField,
   Divider,
+  Switch,
 } from '@mui/material';
 import {
   WebAsset as WebAssetIcon,
@@ -22,7 +22,6 @@ import {
   Edit,
   Delete,
   Replay,
-  ContentCopy,
 } from '@mui/icons-material';
 import CopyText from '../../components/CopyText';
 
@@ -33,6 +32,7 @@ const columns = [
   { id: 'date', label: 'Last check time', style: { whiteSpace: 'nowrap' },
     format: (value) => value ? new Date(value)?.toLocaleString('uk-UA') : ''},
   { id: 'errors', label: 'Errors', align: 'right' },
+  { id: 'running', label: 'Running', align: 'right', style: { width: '50px' } },
 ];
 
 const ProjectLink = ({ type, link }) => {
@@ -142,6 +142,13 @@ const Projects = () => {
     handleModalClose()
   }
 
+  const runningStatusToggle = async (id) => {
+    const { data: result } = await axios.post('/projects/switchRunningStatus', { id })
+    if (!result.success) return console.error(result.error || result);
+
+    fetchData()
+  }
+
   return <Layout>
     <Box sx={{
       display: 'grid',
@@ -211,9 +218,17 @@ const Projects = () => {
                             p: 0,
                             overflow: 'hidden',
                             borderRadius: '1em',
-                            backgroundColor: value ? 'var(--color-green)' : 'var(--color-red)',
+                            backgroundColor: !row.stopped
+                              ? value ? 'var(--color-green)' : 'var(--color-red)'
+                              : 'grey',
                           }}
                         />
+                      }
+              
+                      if (column.id === 'running') {
+                        return <TableCell sx={{ padding: 0, textAlign: 'center' }}>
+                          <Switch key={`running-${row.id}`} defaultChecked={!row.stopped} onChange={() => runningStatusToggle(row.id)} />
+                        </TableCell>
                       }
               
                       return (

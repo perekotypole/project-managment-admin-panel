@@ -23,11 +23,7 @@ const defContent = [
 const secret = process.env.SECRET || 'secret'
 const tokenTime = process.env.TOKENTIME || 20
 
-export const database = (url) => mongoose
-  .connect(url, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+export const database = (url) => mongoose.connect(url)
 
 import { User, Content, Session, Role } from '../models/index.js'
 

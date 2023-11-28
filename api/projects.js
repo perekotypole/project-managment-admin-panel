@@ -16,13 +16,33 @@ router.post('/', dataAccess, async (req, res) => {
   
     const list = await Promise.all(
       (await Project.find({})
-      .sort('status -createdAt')).map(async (el) => {
+      .sort('-createdAt')).map(async (el) => {
         return {
           ...el._doc,
-          errorsCount: await Error.count({ projectID: el._id })
+          errorsCount: await Error.countDocuments({ projectID: el._id })
         }
       })
     )
+
+    let end_index = list.length - 1
+
+    for (let i = 0; i < end_index;) {
+      const el = list[i]
+
+      if (el.stopped) {
+        list.splice(i, 1)
+        list.push(el)
+        end_index--
+        continue
+      }
+
+      if (!el.status) {
+        list.splice(i, 1)
+        list.unshift(el)
+        i++
+        continue
+      }
+    }
 
     return res.json({ 
       success: true,
@@ -150,6 +170,41 @@ router.post('/remove', dataAccess, async (req, res) => {
     
   } catch (error) {
     console.error('/projects/remove => ', error)
+    return res.json({ error })
+  }
+})
+
+router.post('/switchRunningStatus', dataAccess, async (req, res) => {
+  try {
+    const access = req.content.map(({slug}) => slug).includes(accessSlug)
+    if (!access) {
+      res.redirect('/')
+      return
+    } 
+
+    const { id } = req.body
+
+    if (!id) {
+      res.json({ error: 'ID is required' })
+      return
+    }
+
+    const project = await Project.findById(id)
+    const status = !project.stopped
+    await project.updateOne({ $set: { stopped: status } })
+
+    if (status)
+      checkerAddProject(project)
+    else
+      checkerRemoveProject(project.token)
+  
+    return res.json({ 
+      success: true,
+      status
+    })
+    
+  } catch (error) {
+    console.error('/projects/switchRunningStatus => ', error)
     return res.json({ error })
   }
 })

@@ -49,6 +49,7 @@ export const Project = mongoose.model('Project', {
   type: { type: String, enum: ['website', 'telegramBot']},
   link: { type: String },
   status: { type: Boolean, default: () => false },
+  stopped: { type: Boolean, default: () => false },
   
   token: { type: String, unique: true },
   requestLink: { type: String },
