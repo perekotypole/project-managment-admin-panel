@@ -218,7 +218,7 @@ const Projects = () => {
                             p: 0,
                             overflow: 'hidden',
                             borderRadius: '1em',
-                            backgroundColor: !row.stopped
+                            backgroundColor: !row?.stopped
                               ? value ? 'var(--color-green)' : 'var(--color-red)'
                               : 'grey',
                           }}
@@ -227,7 +227,7 @@ const Projects = () => {
               
                       if (column.id === 'running') {
                         return <TableCell sx={{ padding: 0, textAlign: 'center' }}>
-                          <Switch key={`running-${row.id}`} defaultChecked={!row.stopped} onChange={() => runningStatusToggle(row.id)} />
+                          <Switch key={`running-${row.id}`} defaultChecked={!row?.stopped} onChange={() => runningStatusToggle(row.id)} />
                         </TableCell>
                       }
               
