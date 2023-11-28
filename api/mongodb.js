@@ -30,7 +30,13 @@ router.post('/', dataAccess, async (req, res) => {
 
     res.json({
       success: true,
-      users,
+      users: users.sort((a, b) => {
+        if (!a.createdAt && !b.createdAt) return 0
+        if (!a.createdAt) return 1
+        if (!b.createdAt) return -1
+        
+        return b.createdAt - a.createdAt;
+      }),
       host: ip.address(),
       port: client.options.hosts[0].toString()?.split(':')?.[1],
     })
@@ -66,7 +72,12 @@ router.post('/createUser', dataAccess, async (req, res) => {
 
     await db.collection('system.users').findOneAndUpdate(
       { _id: `${DBName}.${userData.user}` },
-      { $set: { title: userData.title, description: userData.description, password: userData.password, }}
+      { $set: {
+        title: userData.title,
+        description: userData.description,
+        password: userData.password,
+        createdAt: new Date(),
+      }}
     )
 
     res.json({
