@@ -1,37 +1,46 @@
-import os from 'os'
-import NetworkSpeed from 'network-speed'
+import os from 'os';
+import NetworkSpeed from 'network-speed';
 
-const testNetworkSpeed = new NetworkSpeed()
+const testNetworkSpeed = new NetworkSpeed();
 
-export const formatBytes = (bytes, pow = 0, decimals = 2) =>
-  parseFloat((bytes / Math.pow(1024, pow))).toFixed(decimals)
+export const formatBytes = (bytes, pow = 0, decimals = 2) => {
+  const formattedBytes = bytes / 1024 ** pow;
+  const roundedBytes = parseFloat(formattedBytes).toFixed(decimals);
+  return roundedBytes;
+};
 
 export const getNetworkSpead = async () => {
-  return await testNetworkSpeed.checkDownloadSpeed(
+  const speed = await testNetworkSpeed.checkDownloadSpeed(
     'https://eu.httpbin.org/stream-bytes/500000',
-    500000
-  )
-}
+    500000,
+  );
+  return speed;
+};
 
 export const getCPUUsage = async () => {
   const cpuInfo1 = os.cpus();
-  const totalCores = cpuInfo1.length;
 
   const totalIdle1 = cpuInfo1.reduce((acc, cpu) => acc + cpu.times.idle, 0);
-  const totalBusy1 = cpuInfo1.reduce((acc, cpu) => acc + (cpu.times.user + cpu.times.nice + cpu.times.sys + cpu.times.irq), 0);
+  const totalBusy1 = cpuInfo1.reduce(
+    (acc, cpu) => acc + (cpu.times.user + cpu.times.nice + cpu.times.sys + cpu.times.irq),
+    0,
+  );
 
   return new Promise((resolve) => {
     setTimeout(() => {
       const cpuInfo2 = os.cpus();
 
       const totalIdle2 = cpuInfo2.reduce((acc, cpu) => acc + cpu.times.idle, 0);
-      const totalBusy2 = cpuInfo2.reduce((acc, cpu) => acc + (cpu.times.user + cpu.times.nice + cpu.times.sys + cpu.times.irq), 0);
+      const totalBusy2 = cpuInfo2.reduce(
+        (acc, cpu) => acc + (cpu.times.user + cpu.times.nice + cpu.times.sys + cpu.times.irq),
+        0,
+      );
 
       const idleDiff = totalIdle2 - totalIdle1;
       const busyDiff = totalBusy2 - totalBusy1;
       const totalDiff = idleDiff + busyDiff;
 
-      const perc = busyDiff / totalDiff
+      const perc = busyDiff / totalDiff;
 
       resolve(perc);
     }, 1000);

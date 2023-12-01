@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "nodemon ssr-server.js",
     "build": "next build",
-    "start": "NODE_ENV=production node ssr-server.js"
+    "start": "NODE_ENV=production node ssr-server.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "@babel/core": "^7.20.12",
@@ -41,5 +43,11 @@
     "react-hook-form": "^7.39.4",
     "recharts": "^2.3.2",
     "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.54.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-react": "^7.33.2"
   }
 }

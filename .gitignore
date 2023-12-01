@@ -1,6 +1,7 @@
 # Created by https://www.toptal.com/developers/gitignore/api/nextjs,node
 # Edit at https://www.toptal.com/developers/gitignore?templates=nextjs,node
 
+.vscode
 /public
 
 ### NextJS ###

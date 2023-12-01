@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+import mongoose from 'mongoose';
 
 export const User = mongoose.model('User', {
   username: { type: String },
@@ -46,11 +46,11 @@ export const Session = mongoose.model('Session', {
 export const Project = mongoose.model('Project', {
   name: { type: String },
   description: { type: String },
-  type: { type: String, enum: ['website', 'telegramBot']},
+  type: { type: String, enum: ['website', 'telegramBot'] },
   link: { type: String },
   status: { type: Boolean, default: () => false },
   stopped: { type: Boolean, default: () => false },
-  
+
   token: { type: String, unique: true },
   requestLink: { type: String },
   noExtraTime: { type: Boolean, default: () => false },
@@ -58,7 +58,7 @@ export const Project = mongoose.model('Project', {
   checkDate: { type: Date },
   telegram: {
     token: { type: String },
-    chat: { type: String }
+    chat: { type: String },
   },
 
   createdAt: { type: Date, default: () => new Date() },

@@ -1,23 +1,23 @@
-import * as dotenv from 'dotenv'
-dotenv.config()
+import * as dotenv from 'dotenv';
 
-import { Router } from 'express'
+import { Router } from 'express';
 import { MongoClient } from 'mongodb';
-import { dataAccess } from './middleware/index.js'
+import ip from 'ip';
+import { dataAccess } from './middleware/index';
 
-import ip from "ip"
+dotenv.config();
 
-const router = Router()
-const accessSlug = 'mongodb'
+const router = Router();
+const accessSlug = 'mongodb';
 
-const DBUrl = process.env.DB_URI ? `${process.env.DB_URI}?authSource=admin` : 'mongodb://0.0.0.0:27017/'
+const DBUrl = process.env.DB_URI ? `${process.env.DB_URI}?authSource=admin` : 'mongodb://0.0.0.0:27017/';
 const DBName = 'admin';
 
 router.post('/', dataAccess, async (req, res) => {
-  const access = req.content.map(({slug}) => slug).includes(accessSlug)
+  const access = req.content.map(({ slug }) => slug).includes(accessSlug);
   if (!access) {
-    res.redirect('/')
-    return
+    res.redirect('/');
+    return {};
   }
 
   const client = new MongoClient(DBUrl);
@@ -31,31 +31,32 @@ router.post('/', dataAccess, async (req, res) => {
     res.json({
       success: true,
       users: users.sort((a, b) => {
-        if (!a.createdAt && !b.createdAt) return 0
-        if (!a.createdAt) return 1
-        if (!b.createdAt) return -1
-        
+        if (!a.createdAt && !b.createdAt) return 0;
+        if (!a.createdAt) return 1;
+        if (!b.createdAt) return -1;
+
         return b.createdAt - a.createdAt;
       }),
       host: ip.address(),
       port: client.options.hosts[0].toString()?.split(':')?.[1],
-    })
+    });
   } catch (error) {
-    console.error('/mongodb => ', error)
-    return res.json({ error })
+    console.error('/mongodb => ', error);
+    return res.json({ error });
   } finally {
     await client.close();
   }
-})
+  return {};
+});
 
 router.post('/createUser', dataAccess, async (req, res) => {
-  const access = req.content.map(({slug}) => slug).includes(accessSlug)
+  const access = req.content.map(({ slug }) => slug).includes(accessSlug);
   if (!access) {
-    res.redirect('/')
-    return
+    res.redirect('/');
+    return {};
   }
 
-  const userData = req.body
+  const userData = req.body;
   const client = new MongoClient(DBUrl);
 
   try {
@@ -72,33 +73,36 @@ router.post('/createUser', dataAccess, async (req, res) => {
 
     await db.collection('system.users').findOneAndUpdate(
       { _id: `${DBName}.${userData.user}` },
-      { $set: {
-        title: userData.title,
-        description: userData.description,
-        password: userData.password,
-        createdAt: new Date(),
-      }}
-    )
+      {
+        $set: {
+          title: userData.title,
+          description: userData.description,
+          password: userData.password,
+          createdAt: new Date(),
+        },
+      },
+    );
 
     res.json({
       success: true,
-    })
+    });
   } catch (error) {
-    console.error('/mongodb/createUser => ', error)
-    return res.json({ error })
+    console.error('/mongodb/createUser => ', error);
+    return res.json({ error });
   } finally {
     await client.close();
   }
-})
+  return {};
+});
 
 router.post('/removeUser', dataAccess, async (req, res) => {
-  const access = req.content.map(({slug}) => slug).includes(accessSlug)
+  const access = req.content.map(({ slug }) => slug).includes(accessSlug);
   if (!access) {
-    res.redirect('/')
-    return
+    res.redirect('/');
+    return {};
   }
-  
-  const userData = req.body
+
+  const userData = req.body;
   const client = new MongoClient(DBUrl);
 
   try {
@@ -113,23 +117,24 @@ router.post('/removeUser', dataAccess, async (req, res) => {
 
     res.json({
       success: true,
-    })
+    });
   } catch (error) {
-    console.error('/mongodb/removeUser => ', error)
-    return res.json({ error })
+    console.error('/mongodb/removeUser => ', error);
+    return res.json({ error });
   } finally {
     await client.close();
   }
-})
+  return {};
+});
 
 router.post('/updateUser', dataAccess, async (req, res) => {
-  const access = req.content.map(({slug}) => slug).includes(accessSlug)
+  const access = req.content.map(({ slug }) => slug).includes(accessSlug);
   if (!access) {
-    res.redirect('/')
-    return
+    res.redirect('/');
+    return {};
   }
 
-  const userData = req.body
+  const userData = req.body;
   const client = new MongoClient(DBUrl);
 
   try {
@@ -146,25 +151,32 @@ router.post('/updateUser', dataAccess, async (req, res) => {
 
     await db.collection('system.users').findOneAndUpdate(
       { _id: `${DBName}.${userData.user}` },
-      { $set: { title: userData.title, description: userData.description, password: userData.password, }}
-    )
+      {
+        $set: {
+          title: userData.title,
+          description: userData.description,
+          password: userData.password,
+        },
+      },
+    );
 
     res.json({
       success: true,
-    })
+    });
   } catch (error) {
-    console.error('/mongodb/updateUser => ', error)
-    return res.json({ error })
+    console.error('/mongodb/updateUser => ', error);
+    return res.json({ error });
   } finally {
     await client.close();
   }
-})
+  return {};
+});
 
 router.post('/databases', dataAccess, async (req, res) => {
-  const access = req.content.map(({slug}) => slug).includes(accessSlug)
+  const access = req.content.map(({ slug }) => slug).includes(accessSlug);
   if (!access) {
-    res.redirect('/')
-    return
+    res.redirect('/');
+    return {};
   }
 
   const client = new MongoClient(DBUrl);
@@ -178,14 +190,15 @@ router.post('/databases', dataAccess, async (req, res) => {
 
     res.json({
       success: true,
-      databases: databases.map(database => database.name),
-    })
+      databases: databases.map((database) => database.name),
+    });
   } catch (error) {
-    console.error('/mongodb/databases => ', error)
-    return res.json({ error })
+    console.error('/mongodb/databases => ', error);
+    return res.json({ error });
   } finally {
     await client.close();
   }
-})
+  return {};
+});
 
-export default router
+export default router;
