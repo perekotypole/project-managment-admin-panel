@@ -1,6 +1,6 @@
 import axios from '../../tools/axios';
 import { useEffect, useMemo, useState } from 'react';
-import Layout from '../../components/Layout';
+
 import Modal from '../../components/Modal';
 
 import {
@@ -149,7 +149,7 @@ const Projects = () => {
     fetchData()
   }
 
-  return <Layout>
+  return <>
     <Box sx={{
       display: 'grid',
       gridTemplateColumns: '1fr 1fr',
@@ -345,7 +345,7 @@ const Projects = () => {
         variant="standard"
       />
     </Modal>
-  </Layout>
+  </>
 }
 
 export default Projects

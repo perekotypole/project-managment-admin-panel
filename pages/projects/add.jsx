@@ -6,13 +6,13 @@ import {
   MenuItem, OutlinedInput, Switch, TextField, Typography
 } from '@mui/material';
 
-import axios from '../../tools/axios';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import Layout from '../../components/Layout';
-import Modal from '../../components/Modal';
+
+import axios from '../../tools/axios';
 import { generateToken } from '../../tools/functions';
+import Modal from '../../components/Modal';
 
 const types = [
   {
@@ -89,7 +89,7 @@ const AddProject = () => {
     router.back()
   }
 
-  return <Layout>
+  return <>
     <Box
       sx={{
         width: '100%',
@@ -194,7 +194,7 @@ const AddProject = () => {
       onCancel={handleClose}
       onSubmit={onSubmit}
     >Confirm creation?</Modal>
-  </Layout>
+  </>
 }
 
 export default AddProject

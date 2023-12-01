@@ -102,7 +102,7 @@ export const checkerRemoveProject = (token) => {
 export const initTimers = async (token) => {
   try {
     await Project.updateMany({}, { status: null })
-    const projects = await Project.find({})
+    const projects = await Project.find({ stopped: { $ne: true }})
     projects.forEach((project) => checkerAddProject(project))
     
   } catch (error) {

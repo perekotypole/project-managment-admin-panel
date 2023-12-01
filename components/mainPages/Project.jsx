@@ -1,7 +1,6 @@
 import axios from '../../tools/axios';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import Layout from '../Layout';
 import Ifraim from '../Ifraim';
 
 const Project = () => {
@@ -21,11 +20,9 @@ const Project = () => {
     fetchProject(id)
   }, [router]);
 
-  if (!project) return <Layout>Loading</Layout>
+  if (!project) return <>Loading</>
 
-  return <Layout>
-    <Ifraim src={project.link}/>
-  </Layout>
+  return <Ifraim src={project.link}/>
 }
 
 export default Project

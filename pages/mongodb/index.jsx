@@ -6,7 +6,6 @@ import {
 } from "@mui/material"
 import { Add, Delete, Edit, Replay } from "@mui/icons-material";
 
-import Layout from "../../components/Layout"
 import Modal from "../../components/Modal";
 import CopyText from '../../components/CopyText';
 
@@ -78,7 +77,7 @@ const DBUsersPage = () => {
     handleModalClose()
   }
 
-  return <Layout>
+  return <>
     <Box sx={{
       display: 'grid',
       gridTemplateColumns: '1fr 3fr',
@@ -183,7 +182,7 @@ const DBUsersPage = () => {
         variant="standard"
       />
     </Modal>
-  </Layout>
+  </>
 }
 
 export default DBUsersPage

@@ -17,7 +17,6 @@ import {
 
 import { generateToken } from '../../tools/functions';
 
-import Layout from '../../components/Layout';
 import Modal from '../../components/Modal';
 import Role from '../../components/Role';
 import md5 from 'md5';
@@ -98,7 +97,7 @@ const AddRole = () => {
     router.back()
   }
 
-  return <Layout>
+  return <>
     <Box
       sx={{
         width: '100%',
@@ -207,7 +206,7 @@ const AddRole = () => {
       onCancel={handleClose}
       onSubmit={onSubmit}
     >Confirm creation?</Modal>
-  </Layout>
+  </>
 }
 
 export default AddRole

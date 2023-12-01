@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { Card, CardActionArea, CardContent, Typography } from '@mui/material';
 
-import Blocks from '../components/blocks/Blocks';
-import Layout from '../components/Layout';
+import Dashboard from '../components/mainPages/Dashboard';
 import Project from '../components/mainPages/Project';
 import StatusPayment from '../components/mainPages/StatusPayment';
 import { Box } from '@mui/system';
@@ -37,9 +36,9 @@ const Home = () => {
     getBlocks()
   }, []);
 
-  return <Layout>
+  return <>
     {blocks?.length
-      ? <Blocks data={blocks} />
+      ? <Dashboard data={blocks} />
       : <>
         <Box display='flex' flexWrap='wrap' gap={3} sx={{ m: 1 }} >
           {projectsLinks.map(({ _id, name }) =>
@@ -69,7 +68,7 @@ const Home = () => {
         </Box>
       </>}
 
-  </Layout>
+  </>
 }
 
 export default Home

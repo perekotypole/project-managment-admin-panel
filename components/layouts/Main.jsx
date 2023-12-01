@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
-import Header from './Header';
+import Header from '../Header';
 
-const Layout = ({ children, noheader = false }) => {
+const MainLayout = ({ children, noheader = false }) => {
   return <Box
     sx={{
       height: '100vh',
@@ -40,4 +40,4 @@ const Layout = ({ children, noheader = false }) => {
   </Box>
 }
 
-export default Layout
+export default MainLayout

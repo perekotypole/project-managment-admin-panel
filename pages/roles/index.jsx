@@ -6,7 +6,6 @@ import {
 } from "@mui/material"
 import { Add, Delete, Edit, Replay } from "@mui/icons-material";
 
-import Layout from "../../components/Layout"
 import Modal from "../../components/Modal";
 import Role from "../../components/Role";
 
@@ -80,7 +79,7 @@ const RolesPage = () => {
     handleModalClose()
   }
 
-  return <Layout>
+  return <>
     <Box sx={{
       display: 'grid',
       gridTemplateColumns: '1fr 3fr',
@@ -207,7 +206,7 @@ const RolesPage = () => {
         variant="standard"
       />
     </Modal>
-  </Layout>
+  </>
 }
 
 export default RolesPage

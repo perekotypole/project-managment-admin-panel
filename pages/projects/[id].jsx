@@ -5,13 +5,13 @@ import { Box, Button, FormControl,
   MenuItem, OutlinedInput, Switch, TextField, Typography
 } from '@mui/material';
 
-import axios from '../../tools/axios';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import Layout from '../../components/Layout';
-import Modal from '../../components/Modal';
+
+import axios from '../../tools/axios';
 import { generateToken } from '../../tools/functions';
+import Modal from '../../components/Modal';
 
 const types = [
   {
@@ -117,7 +117,7 @@ const EditProject = () => {
     setNoExtraTime(!!formData.noExtraTime)
   }, [formData]);
 
-  return <Layout>
+  return <>
     <Box
       sx={{
         width: '100%',
@@ -226,7 +226,7 @@ const EditProject = () => {
       onCancel={handleClose}
       onSubmit={onSubmit}
     >Confirm changes?</Modal>
-  </Layout>
+  </>
 }
 
 export default EditProject

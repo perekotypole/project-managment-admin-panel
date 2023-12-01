@@ -17,7 +17,6 @@ import {
 
 import { generateToken } from '../../tools/functions';
 
-import Layout from '../../components/Layout';
 import Modal from '../../components/Modal';
 import Role from '../../components/Role';
 import md5 from 'md5';
@@ -129,7 +128,7 @@ const EditUser = () => {
     setSelectedRoles(formData.rolesID)
   }, [formData]);
 
-  return <Layout>
+  return <>
     <Box
       sx={{
         width: '100%',
@@ -246,7 +245,7 @@ const EditUser = () => {
       onCancel={handleClose}
       onSubmit={onSubmit}
     >Confirm changes?</Modal>
-  </Layout>
+  </>
 }
 
 export default EditUser

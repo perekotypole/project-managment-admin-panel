@@ -1,4 +1,4 @@
-import axios from "../tools/axios";
+import axios from "../../tools/axios";
 import { useEffect, useMemo, useState } from "react";
 import {
   Box, Button, Checkbox, FormControlLabel, IconButton, List, ListItem,
@@ -8,9 +8,8 @@ import {
 } from "@mui/material"
 import { Delete, Replay } from "@mui/icons-material";
 
-import { getAutoErrorRemoval, setAutoErrorRemoval } from "../tools/functions";
-import Layout from "../components/Layout"
-import Modal from "../components/Modal";
+import { getAutoErrorRemoval, setAutoErrorRemoval } from "../../tools/functions";
+import Modal from "../../components/Modal";
 
 const columns = [
   { id: 'project', label: 'Project', style: { fontWeight: 700 } },
@@ -128,7 +127,7 @@ const ErrorsPage = () => {
     handleModalClose()
   }
 
-  return <Layout>
+  return <>
     <Box sx={{
       display: 'grid',
       gridTemplateColumns: '1fr 3fr',
@@ -282,7 +281,7 @@ const ErrorsPage = () => {
       }
       
     </Modal>
-  </Layout>
+  </>
 }
 
 export default ErrorsPage

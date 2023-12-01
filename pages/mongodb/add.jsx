@@ -15,7 +15,6 @@ import {
   Paper, Select, Stack, TextField, Typography
 } from '@mui/material';
 
-import Layout from '../../components/Layout';
 import Modal from '../../components/Modal';
 
 const accesses = [
@@ -112,7 +111,7 @@ const AddDBUser = () => {
     router.back()
   }
 
-  return <Layout>
+  return <>
     <Box
       sx={{
         width: '100%',
@@ -246,7 +245,7 @@ const AddDBUser = () => {
       onCancel={handleClose}
       onSubmit={onSubmit}
     >Confirm creation?</Modal>
-  </Layout>
+  </>
 }
 
 export default AddDBUser

@@ -7,7 +7,6 @@ import {
 } from "@mui/material"
 import { Add, Delete, Edit, Replay, Save } from "@mui/icons-material";
 
-import Layout from "../../components/Layout"
 import Modal from "../../components/Modal";
 import Role from "../../components/Role";
 import CopyText from "../../components/CopyText";
@@ -119,7 +118,7 @@ const UsersPage = () => {
     })
   }
 
-  return <Layout>
+  return <>
     <Box sx={{
       display: 'grid',
       gridTemplateColumns: '2fr 3fr',
@@ -331,7 +330,7 @@ const UsersPage = () => {
         variant="standard"
       />
     </Modal>
-  </Layout>
+  </>
 }
 
 export default UsersPage

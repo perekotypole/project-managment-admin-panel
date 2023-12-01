@@ -13,7 +13,6 @@ import { Box, Button, Chip, Divider,
   Paper, TextField, Typography
 } from '@mui/material';
 
-import Layout from '../../components/Layout';
 import Modal from '../../components/Modal';
 import Role from '../../components/Role';
 import ColorPicker from '../../components/ColorPicker';
@@ -106,7 +105,7 @@ const AddRole = () => {
     router.back()
   }
 
-  return <Layout>
+  return <>
     <Box
       sx={{
         width: '100%',
@@ -255,7 +254,7 @@ const AddRole = () => {
       onCancel={handleClose}
       onSubmit={onSubmit}
     >Confirm creation?</Modal>
-  </Layout>
+  </>
 }
 
 export default AddRole

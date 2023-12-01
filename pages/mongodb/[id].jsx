@@ -15,7 +15,6 @@ import {
   Paper, Select, Stack, TextField, Typography
 } from '@mui/material';
 
-import Layout from '../../components/Layout';
 import Modal from '../../components/Modal';
 
 const accesses = [
@@ -128,7 +127,7 @@ const EditDBUser = () => {
 
   if (!formData) return <>Loading...</>
 
-  return <Layout>
+  return <>
     <Box
       sx={{
         width: '100%',
@@ -268,7 +267,7 @@ const EditDBUser = () => {
       onCancel={handleClose}
       onSubmit={onSubmit}
     >Confirm changing?</Modal>
-  </Layout>
+  </>
 }
 
 export default EditDBUser
