@@ -1,22 +1,24 @@
-import axios from "../../tools/axios";
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Avatar,
-  Box, Button, Checkbox, Chip, Divider, IconButton, Link, List, ListItem,
-  ListItemButton, ListItemText, Paper, Stack, TextField, Typography
-} from "@mui/material"
-import { Add, Delete, Edit, Replay, Save } from "@mui/icons-material";
+  Box, Button, Divider, IconButton, List, ListItem,
+  ListItemButton, ListItemText, Paper, Stack, TextField, Typography,
+} from '@mui/material';
+import {
+  Add, Delete, Edit, Save,
+} from '@mui/icons-material';
+import axios from '../../tools/axios';
 
-import Modal from "../../components/Modal";
-import Role from "../../components/Role";
-import CopyText from "../../components/CopyText";
+import Modal from '../../components/Modal.jsx';
+import Role from '../../components/Role.jsx';
+import CopyText from '../../components/CopyText.jsx';
 
 const accessStatusList = [
   { title: 'Nothing', slug: null },
   { title: 'Blocked account', slug: 'blocked' },
   { title: 'Waiting for payment', slug: 'payment' },
   { title: 'In development', slug: 'development' },
-]
+];
 
 const UsersPage = () => {
   const [selectedUser, setSelectedUser] = useState(null);
@@ -29,94 +31,108 @@ const UsersPage = () => {
   const [selectedStatus, setSelectedStatus] = useState(null);
 
   const [filter, setFilter] = useState();
-  const filterList = useMemo(() => filter
-    ? usersList.filter(({ username }) =>
-      username.toLowerCase().indexOf(filter.toLowerCase()) !== -1)
-    : usersList
-    , [usersList, filter])
+  const filterList = useMemo(
+    () => (filter
+      ? usersList
+        .filter(({ username }) => username.toLowerCase().indexOf(filter.toLowerCase()) !== -1)
+      : usersList),
+    [usersList, filter],
+  );
 
   const fetchUsers = async () => {
-    const { data: result } = await axios.post('/users')
-    if (!result.success)  return console.error(result.error || result);
+    const { data: result } = await axios.post('/users');
+    if (!result.success) {
+      console.error(result.error || result);
+      return;
+    }
 
-    const { usersList: data } = result
-    setUsersList(data)
-  }
+    const { usersList: data } = result;
+    setUsersList(data);
+  };
   const fetchUserDetail = async () => {
-    const { data: result } = await axios.post('/users/getOne', { id: selectedUser })
-    if (!result.success)  return console.error(result.error || result);
+    const { data: result } = await axios.post('/users/getOne', { id: selectedUser });
+    if (!result.success) {
+      console.error(result.error || result);
+      return;
+    }
 
-    const { user, projects } = result
+    const { user, projects } = result;
     setUserDetails({
       ...user,
       startedProject: user.startedProject || null,
       accessStatus: user.accessStatus || null,
-    })
-    setSelectedProject(user.startedProject || null)
-    setSelectedStatus(user.accessStatus || null)
+    });
+    setSelectedProject(user.startedProject || null);
+    setSelectedStatus(user.accessStatus || null);
 
-    setProjectsList(projects)
-  }
+    setProjectsList(projects);
+  };
 
   useEffect(() => {
-    if (!usersList.length) fetchUsers()
+    if (!usersList.length) fetchUsers();
   }, []);
   useEffect(() => {
-    if (selectedUser) fetchUserDetail()
+    if (selectedUser) fetchUserDetail();
   }, [selectedUser]);
 
-  const [open, setOpen] = useState(false)
-  const handleModalOpen = () => setOpen(true)
-  const handleModalClose = () => setOpen(false)
+  const [open, setOpen] = useState(false);
+  const handleModalOpen = () => setOpen(true);
+  const handleModalClose = () => setOpen(false);
 
-  const [elemOnRemove, setElemOnRemove] = useState(null)
-  const [nameForRemoval, setNameForRemoval] = useState('')
-  const [removalRole, setRemovalRole] = useState(null)
+  const [elemOnRemove, setElemOnRemove] = useState(null);
+  const [nameForRemoval, setNameForRemoval] = useState('');
+  const [removalRole, setRemovalRole] = useState(null);
 
   useEffect(() => {
     if (!open) {
-      setElemOnRemove(null)
-      setNameForRemoval('')
-      setRemovalRole(null)
+      setElemOnRemove(null);
+      setNameForRemoval('');
+      setRemovalRole(null);
     }
   }, [open]);
 
   const removeRole = (elem) => {
-    setElemOnRemove(elem)
-    handleModalOpen()
-  }
+    setElemOnRemove(elem);
+    handleModalOpen();
+  };
 
   const comfirmRemove = async () => {
     if (elemOnRemove.username !== nameForRemoval) {
-      setRemovalRole('Values don`t match')
-      return
+      setRemovalRole('Values don`t match');
+      return;
     }
 
-    const { data: result } = await axios.post('/users/remove', { id: elemOnRemove._id })
-    if (!result.success)  return console.error(result.error || result);
+    const { data: result } = await axios.post('/users/remove', { id: elemOnRemove.id });
+    if (!result.success) {
+      console.error(result.error || result);
+      return;
+    }
 
-    fetchUsers()
+    fetchUsers();
 
-    setUserDetails(null)
-    setSelectedUser(null)
+    setUserDetails(null);
+    setSelectedUser(null);
 
-    handleModalClose()
-  }
+    handleModalClose();
+  };
 
   const saveChanged = async () => {
     const { data: result } = await axios.post('/users/updateSelectedData', {
       id: selectedUser,
       status: selectedStatus,
       project: selectedProject,
-    })
-    if (!result.success)  return console.error(result.error || result);
-    
+    });
+    if (!result.success) {
+      console.error(result.error || result);
+      return;
+    }
+
     setUserDetails({
       ...userDetails,
       startedProject: selectedProject,
       accessStatus: selectedStatus,
-    })
-  }
+    });
+  };
 
   return <>
     <Box sx={{
@@ -130,7 +146,8 @@ const UsersPage = () => {
       minHeight: '100%',
     }}>
       <Paper sx={{
-        m: 1, p: 2,
+        m: 1,
+        p: 2,
         overflow: 'hidden',
         maxHeight: 'calc(100% - 16px)',
         display: 'grid',
@@ -142,28 +159,28 @@ const UsersPage = () => {
 
         <Box sx={{
           height: '100%',
-          overflowY: 'auto'
+          overflowY: 'auto',
         }}>
           <List>
             {filterList.map(((el, i) => (
-              <div key={el._id}>
+              <div key={el.id}>
                 <ListItem disablePadding>
                   <ListItemButton
-                    selected={selectedUser === el._id}
-                    onClick={() => setSelectedUser(el._id)}
+                    selected={selectedUser === el.id}
+                    onClick={() => setSelectedUser(el.id)}
                     sx={{ px: 1 }}
                   >
                     <Stack direction={'row'} spacing={1}>
                       <Avatar src={userDetails?.image} />
 
                       <Box>
-                        <Typography variant="subtitle1" fontWeight={700} sx={{ pl: .5 }}>
+                        <Typography variant="subtitle1" fontWeight={700} sx={{ pl: 0.5 }}>
                           {el.username}
                         </Typography>
 
                         <Box display={'flex'} sx={{ gap: 1 }}>
-                          {el.rolesID.map((role => (
-                            <Role key={role._id} color={role.color}>{role.name}</Role>
+                          {el.rolesID.map(((role) => (
+                            <Role key={role.id} color={role.color}>{role.name}</Role>
                           )))}
                         </Box>
                       </Box>
@@ -171,8 +188,8 @@ const UsersPage = () => {
                   </ListItemButton>
                 </ListItem>
 
-                {i !== filterList.length - 1 &&
-                  <Divider sx={{ width: '100%', my: 1 }} />
+                {i !== filterList.length - 1
+                  && <Divider sx={{ width: '100%', my: 1 }} />
                 }
               </div>
             )))}
@@ -188,24 +205,24 @@ const UsersPage = () => {
         maxHeight: '100%',
         overflow: 'hidden',
         display: 'grid',
-        gridTemplateRows: '1fr auto'
+        gridTemplateRows: '1fr auto',
       }}>
         {userDetails && <Box>
           <Stack direction='row' spacing={1} justifyContent='space-between'>
             <Typography variant='h5'>{userDetails.username}</Typography>
 
             <Stack direction="row">
-              <IconButton href={`/users/${userDetails._id}`}><Edit /></IconButton>
-              {!userDetails.baseUser &&
-                <IconButton onClick={() => removeRole(userDetails)}><Delete /></IconButton>
+              <IconButton href={`/users/${userDetails.id}`}><Edit /></IconButton>
+              {!userDetails.baseUser
+                && <IconButton onClick={() => removeRole(userDetails)}><Delete /></IconButton>
               }
             </Stack>
           </Stack>
 
           <Box display={'flex'} sx={{ gap: 1, mb: 1 }}>
-            {userDetails.rolesID.map((role => (
-              <Role key={role._id} color={role.color}>{role.name}</Role>
-              )))}
+            {userDetails.rolesID.map(((role) => (
+              <Role key={role.id} color={role.color}>{role.name}</Role>
+            )))}
           </Box>
 
           <Box>
@@ -225,8 +242,8 @@ const UsersPage = () => {
             <Typography variant='body2'><i>Description</i>: {userDetails.description}</Typography>
           </>}
 
-          {!userDetails.baseUser &&
-            <>
+          {!userDetails.baseUser
+            && <>
               <Typography variant='body2'><i>Created</i>: {new Date(userDetails.createdAt).toLocaleString('uk-UA')}</Typography>
               <Divider sx={{ my: 2 }} />
 
@@ -241,17 +258,18 @@ const UsersPage = () => {
                 }}
               >
                 <Paper sx={{
-                  m: 1, p: 2,
+                  m: 1,
+                  p: 2,
                   maxHeight: '500px',
-                  overflowY: 'auto'
+                  overflowY: 'auto',
                 }}>
                   <List subheader={
                     <Typography variant='h6'>Access status</Typography>
                   }>
-                    {accessStatusList.map((el => (
+                    {accessStatusList.map(((el) => (
                       <ListItem disablePadding key={el.slug || 'nothing'}>
                         <ListItemButton
-                          selected={selectedStatus == el.slug}
+                          selected={selectedStatus === el.slug}
                           onClick={() => setSelectedStatus(el.slug || null)}
                         >
                           <ListItemText primary={el.title} />
@@ -262,9 +280,10 @@ const UsersPage = () => {
                 </Paper>
 
                 <Paper sx={{
-                  m: 1, p: 2,
+                  m: 1,
+                  p: 2,
                   maxHeight: '500px',
-                  overflowY: 'auto'
+                  overflowY: 'auto',
                 }}>
                   <List subheader={
                     <Typography variant='h6'>Started page</Typography>
@@ -278,12 +297,12 @@ const UsersPage = () => {
                       </ListItemButton>
                     </ListItem>
 
-                    {projectsList.map((el => (
-                      <ListItem disablePadding key={el._id}>
+                    {projectsList.map(((el) => (
+                      <ListItem disablePadding key={el.id}>
                         <ListItemButton
                           disabled={el.type !== 'website' || !el.link}
-                          selected={selectedProject === el._id}
-                          onClick={() => setSelectedProject(el._id)}
+                          selected={selectedProject === el.id}
+                          onClick={() => setSelectedProject(el.id)}
                         >
                           <ListItemText primary={el.name} />
                         </ListItemButton>
@@ -292,10 +311,10 @@ const UsersPage = () => {
                   </List>
                 </Paper>
               </Box>
-              
+
               {((selectedProject !== userDetails.startedProject)
-              || (selectedStatus !== userDetails.accessStatus)) &&
-                <Box sx={{
+              || (selectedStatus !== userDetails.accessStatus))
+                && <Box sx={{
                   display: 'flex',
                   justifyContent: 'flex-end',
                   gap: 1,
@@ -322,15 +341,15 @@ const UsersPage = () => {
         error={!!removalRole}
         helperText={removalRole}
         onChange={(e) => {
-          setNameForRemoval(e.target.value)
-          if (removalRole) setRemovalRole(null)
+          setNameForRemoval(e.target.value);
+          if (removalRole) setRemovalRole(null);
         }}
         value={nameForRemoval}
         label="Project name"
         variant="standard"
       />
     </Modal>
-  </>
-}
+  </>;
+};
 
-export default UsersPage
+export default UsersPage;

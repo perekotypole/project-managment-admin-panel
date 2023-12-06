@@ -1,81 +1,91 @@
-import axios from "../../tools/axios";
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from 'react';
 import {
-  Box, Button, Chip, Divider, IconButton, Link, List, ListItem,
-  ListItemButton, Paper, Stack, TextField, Typography
-} from "@mui/material"
-import { Add, Delete, Edit, Replay } from "@mui/icons-material";
+  Box, Button, Chip, Divider, IconButton, List, ListItem,
+  ListItemButton, Paper, Stack, TextField, Typography,
+} from '@mui/material';
+import {
+  Add, Delete, Edit,
+} from '@mui/icons-material';
+import axios from '../../tools/axios';
 
-import Modal from "../../components/Modal";
-import CopyText from '../../components/CopyText';
+import Modal from '../../components/Modal.jsx';
+import CopyText from '../../components/CopyText.jsx';
 
 const DBUsersPage = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [usersList, setUsersList] = useState([]);
-  const [DBHost, setDBHost] = useState('');
-  
+  const [DBHost] = useState('');
+
   const [userRoles, setUserRoles] = useState([]);
   const userDetails = useMemo(() => {
-    const user = usersList.find(el => el.user === selectedUser)
-    if (user) setUserRoles(user.roles)
-    return user
+    const user = usersList.find((el) => el.user === selectedUser);
+    if (user) setUserRoles(user.roles);
+    return user;
   }, [selectedUser]);
-  
+
   const [filter, setFilter] = useState();
-  const filterList = useMemo(() => filter
-    ? usersList.filter(({ title = null }) => {
-      if (!title) return false
-      return title.toLowerCase().indexOf(filter.toLowerCase()) !== -1
-    }) : usersList
-  , [usersList, filter])
+  const filterList = useMemo(
+    () => (filter
+      ? usersList.filter(({ title = null }) => {
+        if (!title) return false;
+        return title.toLowerCase().indexOf(filter.toLowerCase()) !== -1;
+      }) : usersList),
+    [usersList, filter],
+  );
 
   const fetchUsers = async () => {
-    const { data: result } = await axios.post('/mongodb')
-    if (!result.success) return console.error(result.error || result);
+    const { data: result } = await axios.post('/mongodb');
+    if (!result.success) {
+      console.error(result.error || result);
+      return;
+    }
 
-    const { users: data, host, port } = result
-    setUsersList(data)
-  }
-  
+    const { users: data } = result;
+    setUsersList(data);
+  };
+
   useEffect(() => {
-    if (!usersList.length) fetchUsers()
+    if (!usersList.length) fetchUsers();
   }, []);
 
-  const [open, setOpen] = useState(false)
-  const handleModalOpen = () => setOpen(true)
-  const handleModalClose = () => setOpen(false)
+  const [open, setOpen] = useState(false);
+  const handleModalOpen = () => setOpen(true);
+  const handleModalClose = () => setOpen(false);
 
-  const [elemOnRemove, setElemOnRemove] = useState(null)
-  const [nameForRemoval, setNameForRemoval] = useState('')
-  const [removalUser, setRemovalUser] = useState(null)
+  const [elemOnRemove, setElemOnRemove] = useState(null);
+  const [nameForRemoval, setNameForRemoval] = useState('');
+  const [removalUser, setRemovalUser] = useState(null);
 
   useEffect(() => {
     if (!open) {
-      setElemOnRemove(null)
-      setNameForRemoval('')
-      setRemovalUser(null)
+      setElemOnRemove(null);
+      setNameForRemoval('');
+      setRemovalUser(null);
     }
   }, [open]);
 
   const removeUser = (elem) => {
-    setElemOnRemove(elem)
-    handleModalOpen()
-  }
+    setElemOnRemove(elem);
+    handleModalOpen();
+  };
 
   const comfirmRemove = async () => {
     if (elemOnRemove.user !== nameForRemoval) {
-      setRemovalUser('Values don`t match')
-      return
+      setRemovalUser('Values don`t match');
+      return;
     }
 
-    const { data: result } = await axios.post('/mongodb/removeUser', { user: elemOnRemove.user })
-    if (!result.success) return console.error(result.error || result);
+    const { data: result } = await axios.post('/mongodb/removeUser', { user: elemOnRemove.user });
+    if (!result.success) {
+      console.error(result.error || result);
+      return;
+    }
 
-    fetchUsers()
-    setSelectedUser(null)
+    fetchUsers();
+    setSelectedUser(null);
 
-    handleModalClose()
-  }
+    handleModalClose();
+  };
 
   return <>
     <Box sx={{
@@ -83,13 +93,14 @@ const DBUsersPage = () => {
       gridTemplateColumns: '1fr 3fr',
       '@media screen and (max-width: 780px)': {
         gridTemplateColumns: '1fr',
-        gridTemplateRows: '350px auto', 
+        gridTemplateRows: '350px auto',
       },
       gap: 4,
       minHeight: '100%',
     }}>
       <Paper sx={{
-        m: 1, p: 2,
+        m: 1,
+        p: 2,
         overflow: 'hidden',
         maxHeight: 'calc(100% - 16px)',
         display: 'grid',
@@ -101,11 +112,11 @@ const DBUsersPage = () => {
 
         <Box sx={{
           height: '100%',
-          overflowY: 'auto'
+          overflowY: 'auto',
         }}>
           <List>
-            {filterList.map((el => (
-              <ListItem disablePadding key={el._id}>
+            {filterList.map(((el) => (
+              <ListItem disablePadding key={el.id}>
                 <ListItemButton
                   selected={selectedUser === el.user}
                   onClick={() => setSelectedUser(el.user)}
@@ -126,7 +137,7 @@ const DBUsersPage = () => {
         maxHeight: '100%',
         overflow: 'hidden',
         display: 'grid',
-        gridTemplateRows: '1fr auto'
+        gridTemplateRows: '1fr auto',
       }}>
         {userDetails && <Box>
           <Stack direction='row' spacing={1} justifyContent='space-between'>
@@ -134,8 +145,8 @@ const DBUsersPage = () => {
 
             <Stack direction="row" flexWrap='wrap'>
               <IconButton href={`/mongodb/${userDetails.user}`}><Edit /></IconButton>
-              {!userDetails.baseRole && 
-                <IconButton onClick={() => removeUser(userDetails)}><Delete /></IconButton>
+              {!userDetails.baseRole
+                && <IconButton onClick={() => removeUser(userDetails)}><Delete /></IconButton>
               }
             </Stack>
           </Stack>
@@ -152,9 +163,7 @@ const DBUsersPage = () => {
             <Typography variant='subtitle1'>Databases:</Typography>
 
             <Stack direction='row' spacing={1} sx={{ my: 1 }}>
-              {userRoles.map((el, i) =>
-                <Chip key={`${el.db}-${el.role}-${i}`} label={`${el.db} | ${el.role}`} variant="outlined" />
-              )}
+              {userRoles.map((el, i) => <Chip key={`${el.db}-${el.role}-${i}`} label={`${el.db} | ${el.role}`} variant="outlined" />)}
             </Stack>
           </Box> }
         </Box>}
@@ -174,15 +183,15 @@ const DBUsersPage = () => {
         error={!!removalUser}
         helperText={removalUser}
         onChange={(e) => {
-          setNameForRemoval(e.target.value)
-          if (removalUser) setRemovalUser(null)
+          setNameForRemoval(e.target.value);
+          if (removalUser) setRemovalUser(null);
         }}
         value={nameForRemoval}
         label="Username"
         variant="standard"
       />
     </Modal>
-  </>
-}
+  </>;
+};
 
-export default DBUsersPage
+export default DBUsersPage;

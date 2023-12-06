@@ -1,15 +1,17 @@
-import { Box, Button, ClickAwayListener, Tooltip, Zoom } from '@mui/material';
-import { useState } from 'react';
+import React, { useState } from 'react';
+import {
+  Button, ClickAwayListener, Tooltip, Zoom,
+} from '@mui/material';
 
 const CopyText = ({ children, hideText }) => {
   const [open, setOpen] = useState(false);
-  const handleTooltipClose = () => setOpen(false)
+  const handleTooltipClose = () => setOpen(false);
   const handleTooltipOpen = () => {
-    navigator.clipboard.writeText(children)
-    setOpen(true)
+    navigator.clipboard.writeText(children);
+    setOpen(true);
 
     setTimeout(handleTooltipClose, 1000);
-  }
+  };
 
   return <ClickAwayListener onClickAway={handleTooltipClose}>
     <Tooltip
@@ -31,18 +33,18 @@ const CopyText = ({ children, hideText }) => {
             m: '.1em',
             color: '#000',
             textTransform: 'none',
-            backgroundColor: "#dae3f1",
+            backgroundColor: '#dae3f1',
             borderRadius: '.5em',
             transition: 'all .5s',
             '&:hover': {
-              backgroundColor: "#c0ccdf",
-            }
+              backgroundColor: '#c0ccdf',
+            },
           }}
         >
           {hideText || children}
         </Button>
       </Tooltip>
-  </ClickAwayListener>
-}
+  </ClickAwayListener>;
+};
 
-export default CopyText
+export default CopyText;

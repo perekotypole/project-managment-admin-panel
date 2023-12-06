@@ -1,31 +1,32 @@
-import axios from '../../tools/axios';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { Save as SaveIcon } from '@mui/icons-material';
-import { Box, Button, Chip, Divider,
+import {
+  Box, Button, Chip, Divider,
   Grid,
   List,
   ListItem,
   ListItemButton,
   ListItemText,
-  Paper, TextField, Typography
+  Paper, TextField, Typography,
 } from '@mui/material';
+import axios from '../../tools/axios';
 
-import Modal from '../../components/Modal';
-import Role from '../../components/Role';
-import ColorPicker from '../../components/ColorPicker';
+import Modal from '../../components/Modal.jsx';
+import Role from '../../components/Role.jsx';
+import ColorPicker from '../../components/ColorPicker.jsx';
 
 const EditRole = () => {
-  const router = useRouter()
-  const { id } = router.query
+  const router = useRouter();
+  const { id } = router.query;
 
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true);
 
-  const [open, setOpen] = useState(false)
-  const handleOpen = () => setOpen(true)
-  const handleClose = () => setOpen(false)
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   const { register, handleSubmit } = useForm({});
 
@@ -34,13 +35,13 @@ const EditRole = () => {
     {...props}
     fullWidth
     variant="outlined"
-  >{children}</TextField>
+  >{children}</TextField>;
 
-  const [formData, setFormData] = useState({})
-  const [base, setBase] = useState(false)
+  const [formData, setFormData] = useState({});
+  const [base, setBase] = useState(false);
   const [roleName, setRoleName] = useState('');
-  const [color, setColor] = useState("#000000");
-  const [formErrors, setFormErrors] = useState({})
+  const [color, setColor] = useState('#000000');
+  const [formErrors, setFormErrors] = useState({});
 
   const [projectsList, setProjectsList] = useState([]);
   const [selectedProjects, setSelectedProjects] = useState([]);
@@ -51,51 +52,60 @@ const EditRole = () => {
 
   const [filterProjects, setFilter] = useState();
 
-  const filterProjectsList = useMemo(() => filterProjects
-    ? projectsList.filter(({ name }) =>
-      name.toLowerCase().indexOf(filterProjects.toLowerCase()) !== -1)
-    : projectsList
-  , [projectsList, filterProjects])
+  const filterProjectsList = useMemo(
+    () => (filterProjects
+      ? projectsList
+        .filter(({ name }) => name.toLowerCase().indexOf(filterProjects.toLowerCase()) !== -1)
+      : projectsList),
+    [projectsList, filterProjects],
+  );
 
   const fetchData = async () => {
-    const { data: result } = await axios.post('/roles/getOne', { id })
-    if (!result.success) return console.error(result.error || result);
+    const { data: result } = await axios.post('/roles/getOne', { id });
+    if (!result.success) {
+      console.error(result.error || result);
+      return;
+    }
 
-    const { role } = result
+    const { role } = result;
 
-    setBase(role.baseRole)
+    setBase(role.baseRole);
     setFormData({
       name: role.name,
       color: role.color,
       description: role.description,
-      blocks: role.blocks.map(el => el._id),
-      content: role.content.map(el => el._id),
-      access: role.access.map(el => el._id),
-    })
-  }
+      blocks: role.blocks.map((el) => el.id),
+      content: role.content.map((el) => el.id),
+      access: role.access.map((el) => el.id),
+    });
+  };
 
   const fetchLists = async () => {
-    const { data: result } = await axios.post('/roles/getAllContent')
-    if (!result.success) return console.error(result.error || result);
+    const { data: result } = await axios.post('/roles/getAllContent');
+    if (!result.success) {
+      console.error(result.error || result);
+      return;
+    }
 
-    const { projects, blocks, pages } = result
-    setProjectsList(projects)
-    setPagesList(pages)
-    setBlocksList(blocks)
-  }
+    const { projects, blocks, pages } = result;
+    setProjectsList(projects);
+    setPagesList(pages);
+    setBlocksList(blocks);
+  };
 
-  const checkData = (data) => {
-    const errors = {}
-    setFormErrors(errors)
+  const checkData = (d) => {
+    const data = d;
+    const errors = {};
+    setFormErrors(errors);
 
-    data.name = roleName
-    data.color = color
+    data.name = roleName;
+    data.color = color;
 
-    if (!data.name) errors.name = 'Role name is required'
+    if (!data.name) errors.name = 'Role name is required';
 
-    if (Object.keys(errors).length){
-      setFormErrors(errors)
-      return
+    if (Object.keys(errors).length) {
+      setFormErrors(errors);
+      return;
     }
 
     setFormData({
@@ -105,38 +115,39 @@ const EditRole = () => {
       blocks: selectedBlocks,
       content: selectedPages,
       access: selectedProjects,
-    })
-    handleOpen()
-  }
+    });
+    handleOpen();
+  };
 
   const onSubmit = async () => {
-    const { data: result } = await axios.post('/roles/edit', { id, roleData: formData })
+    const { data: result } = await axios.post('/roles/edit', { id, roleData: formData });
     if (!result.success) {
       console.error(result.error || result);
-      return handleClose()
+      handleClose();
+      return;
     }
 
-    router.back()
-  }
+    router.back();
+  };
 
   useEffect(() => {
     if (id) {
-      fetchLists()
-      fetchData(id)
+      fetchLists();
+      fetchData(id);
     }
   }, [id]);
 
   useEffect(() => {
-    if (!Object.keys(formData).length) return
+    if (!Object.keys(formData).length) return;
 
-    setLoading(false)
+    setLoading(false);
 
-    setRoleName(formData.name)
-    setColor(formData.color)
+    setRoleName(formData.name);
+    setColor(formData.color);
 
-    setSelectedProjects(formData.access)
-    setSelectedPages(formData.content)
-    setSelectedBlocks(formData.blocks)
+    setSelectedProjects(formData.access);
+    setSelectedPages(formData.content);
+    setSelectedBlocks(formData.blocks);
   }, [formData]);
 
   return <>
@@ -149,13 +160,13 @@ const EditRole = () => {
         gridTemplateRows: '1fr auto',
         gap: 1,
       }}
-    > 
-      { !loading &&
-        <>
+    >
+      { !loading
+        && <>
           <form style={{ heigth: '100%' }}>
             <Grid container spacing={6} alignItems="flex-start" justifyContent='start'>
               <Grid container spacing={2} item md={6} sm={12}>
-                <Grid item xs={12} sx={{ display: 'flex', gap: 2, alignContent: "center" }}>
+                <Grid item xs={12} sx={{ display: 'flex', gap: 2, alignContent: 'center' }}>
                   <Typography variant="h5">Main info</Typography>
                   {!!roleName && <Role color={color}>{roleName}</Role>}
                 </Grid>
@@ -166,7 +177,7 @@ const EditRole = () => {
                     label="Project name"
                     fullWidth
                     value={roleName}
-                    onChange={(e) => { setRoleName(e.target.value) }}
+                    onChange={(e) => { setRoleName(e.target.value); }}
                     error={formErrors.name}
                     helperText={formErrors.name}
                   />
@@ -188,23 +199,24 @@ const EditRole = () => {
                 {!!blocksList.length && <>
                   <Typography variant="h6" sx={{ mt: 2 }}>Dashboard Blocks</Typography>
                   <Paper sx={{
-                    m: 1, p: 2,
+                    m: 1,
+                    p: 2,
                     maxHeight: '250px',
-                    overflowY: 'auto'
+                    overflowY: 'auto',
                   }}>
                     <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                      {blocksList.map((el => (
+                      {blocksList.map(((el) => (
                         <Chip
-                          key={el._id}
+                          key={el.id}
                           label={el.title}
                           color={'primary'}
                           disabled={base}
-                          variant={selectedBlocks.includes(el._id) ? "filled" : "outlined"}
+                          variant={selectedBlocks.includes(el.id) ? 'filled' : 'outlined'}
                           onClick={() => {
-                            if (selectedBlocks.includes(el._id)) {
-                              setSelectedBlocks(selectedBlocks.filter(id => id !== el._id))
+                            if (selectedBlocks.includes(el.id)) {
+                              setSelectedBlocks(selectedBlocks.filter((i) => i !== el.id));
                             } else {
-                              setSelectedBlocks([...selectedBlocks, el._id])
+                              setSelectedBlocks([...selectedBlocks, el.id]);
                             }
                           }}
                         />
@@ -216,23 +228,24 @@ const EditRole = () => {
                 {!!pagesList.length && <>
                   <Typography variant="h6" sx={{ mt: 2 }}>Default Pages</Typography>
                   <Paper sx={{
-                    m: 1, p: 2,
+                    m: 1,
+                    p: 2,
                     maxHeight: '250px',
-                    overflowY: 'auto'
+                    overflowY: 'auto',
                   }}>
                     <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                      {pagesList.map((el => (
+                      {pagesList.map(((el) => (
                         <Chip
-                          key={el._id}
+                          key={el.id}
                           label={el.title}
                           color={'primary'}
                           disabled={base}
-                          variant={selectedPages.includes(el._id) ? "filled" : "outlined"}
+                          variant={selectedPages.includes(el.id) ? 'filled' : 'outlined'}
                           onClick={() => {
-                            if (selectedPages.includes(el._id)) {
-                              setSelectedPages(selectedPages.filter(id => id !== el._id))
+                            if (selectedPages.includes(el.id)) {
+                              setSelectedPages(selectedPages.filter((i) => i !== el.id));
                             } else {
-                              setSelectedPages([...selectedPages, el._id])
+                              setSelectedPages([...selectedPages, el.id]);
                             }
                           }}
                         />
@@ -244,9 +257,10 @@ const EditRole = () => {
                 {!!projectsList.length && <>
                   <Typography variant="h6" sx={{ mt: 2 }}>Projects</Typography>
                   <Paper sx={{
-                    m: 1, p: 2,
+                    m: 1,
+                    p: 2,
                     maxHeight: '350px',
-                    overflowY: 'auto'
+                    overflowY: 'auto',
                   }}>
                     <List >
                       <ListItem>
@@ -254,15 +268,15 @@ const EditRole = () => {
                           label="Search" onChange={(e) => setFilter(e.target.value)} />
                       </ListItem>
 
-                      {filterProjectsList.map((el => (
-                        <ListItem disablePadding key={el._id}>
+                      {filterProjectsList.map(((el) => (
+                        <ListItem disablePadding key={el.id}>
                           <ListItemButton
-                            selected={selectedProjects.includes(el._id)}
+                            selected={selectedProjects.includes(el.id)}
                             onClick={() => {
-                              if (selectedProjects.includes(el._id)) {
-                                setSelectedProjects(selectedProjects.filter(id => id !== el._id))
+                              if (selectedProjects.includes(el.id)) {
+                                setSelectedProjects(selectedProjects.filter((i) => i !== el.id));
                               } else {
-                                setSelectedProjects([...selectedProjects, el._id])
+                                setSelectedProjects([...selectedProjects, el.id]);
                               }
                             }}
                           >
@@ -294,7 +308,7 @@ const EditRole = () => {
       onCancel={handleClose}
       onSubmit={onSubmit}
     >Confirm changes?</Modal>
-  </>
-}
+  </>;
+};
 
-export default EditRole
+export default EditRole;

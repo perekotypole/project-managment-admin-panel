@@ -1,15 +1,15 @@
+import React from 'react';
 import { Box } from '@mui/material';
-import Header from '../Header';
+import Header from '../Header.jsx';
 
-const MainLayout = ({ children, noheader = false }) => {
-  return <Box
+const MainLayout = ({ children, noheader = false }) => <Box
     sx={{
       height: '100vh',
       p: '2vw 5vw',
       overflow: 'hidden',
       display: 'grid',
       gridTemplateRows: 'auto 1fr auto',
-      gap: '3vh'
+      gap: '3vh',
     }}
   >
     <Header onlyLogout={noheader}></Header>
@@ -19,7 +19,7 @@ const MainLayout = ({ children, noheader = false }) => {
       sx={{ overflow: 'hidden' }}
     >
       <Box sx={{
-        height: "100%",
+        height: '100%',
         overflow: 'auto',
       }}>
         {children}
@@ -31,13 +31,12 @@ const MainLayout = ({ children, noheader = false }) => {
         display: 'flex',
         justifyContent: {
           xs: 'center',
-          sm: 'flex-end'
-        }
+          sm: 'flex-end',
+        },
       }}
     >
       Copyrights ©{ new Date().getFullYear() }. QTEAM
     </Box>
-  </Box>
-}
+  </Box>;
 
-export default MainLayout
+export default MainLayout;

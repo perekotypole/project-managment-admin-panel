@@ -1,8 +1,7 @@
+import React from 'react';
 
-const StatusPayment = () => {
-  return <>
-    {'Заглушка (сюди скажеш які сторінки створювати)'}
-  </>
-}
+const StatusPayment = () => <>
+  {'Заглушка (сюди скажеш які сторінки створювати)'}
+</>;
 
-export default StatusPayment
+export default StatusPayment;

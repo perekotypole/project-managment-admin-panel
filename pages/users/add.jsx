@@ -1,6 +1,5 @@
-import axios from '../../tools/axios';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { Autorenew, Save as SaveIcon } from '@mui/icons-material';
@@ -12,21 +11,22 @@ import {
   List,
   ListItem,
   ListItemButton,
-  Paper, TextField, Typography, Stack, OutlinedInput, IconButton
+  Paper, TextField, Typography, Stack, OutlinedInput, IconButton,
 } from '@mui/material';
 
+import md5 from 'md5';
 import { generateToken } from '../../tools/functions';
 
-import Modal from '../../components/Modal';
-import Role from '../../components/Role';
-import md5 from 'md5';
+import Modal from '../../components/Modal.jsx';
+import Role from '../../components/Role.jsx';
+import axios from '../../tools/axios';
 
 const AddRole = () => {
-  const router = useRouter()
+  const router = useRouter();
 
-  const [open, setOpen] = useState(false)
-  const handleOpen = () => setOpen(true)
-  const handleClose = () => setOpen(false)
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   const { register, handleSubmit } = useForm({});
 
@@ -35,46 +35,52 @@ const AddRole = () => {
     {...register(props.name)}
     fullWidth
     variant="outlined"
-  >{children}</TextField>
+  >{children}</TextField>;
 
-  const [formData, setFormData] = useState({})
-  const [password, setPassword] = useState('')
-  const [formErrors, setFormErrors] = useState({})
+  const [formData, setFormData] = useState({});
+  const [password, setPassword] = useState('');
+  const [formErrors, setFormErrors] = useState({});
 
   const [rolesList, setRolesList] = useState([]);
   const [selectedRoles, setSelectedRoles] = useState([]);
 
   const [filterRoles, setFilterRoles] = useState();
-  const filterRolesList = useMemo(() => filterRoles
-    ? rolesList.filter(({ name }) => name.toLowerCase().indexOf(filterRoles.toLowerCase()) !== -1)
-    : rolesList
-    , [rolesList, filterRoles])
+  const filterRolesList = useMemo(
+    () => (filterRoles
+      ? rolesList.filter(({ name }) => name.toLowerCase().indexOf(filterRoles.toLowerCase()) !== -1)
+      : rolesList),
+    [rolesList, filterRoles],
+  );
 
   const fetchData = async () => {
-    const { data: result } = await axios.post('/roles')
-    if (!result.success)  return console.error(result.error || result);
+    const { data: result } = await axios.post('/roles');
+    if (!result.success) {
+      console.error(result.error || result);
+      return;
+    }
 
-    const { rolesList } = result
-    setRolesList(rolesList)
-  }
+    const { rolesList: list } = result;
+    setRolesList(list);
+  };
 
   useEffect(() => {
-    if (!rolesList.length) fetchData()
+    if (!rolesList.length) fetchData();
   }, []);
 
-  const checkData = (data) => {
-    const errors = {}
-    setFormErrors(errors)
+  const checkData = (d) => {
+    const data = d;
+    const errors = {};
+    setFormErrors(errors);
 
-    data.password = password
+    data.password = password;
 
-    if (!data.username) errors.username = 'Userame is required'
-    if (!data.login) errors.login = 'Login is required'
+    if (!data.username) errors.username = 'Userame is required';
+    if (!data.login) errors.login = 'Login is required';
     // if (!data.password) data.password = setPassword(generateToken(12))
 
     if (Object.keys(errors).length) {
-      setFormErrors(errors)
-      return
+      setFormErrors(errors);
+      return;
     }
 
     setFormData({
@@ -83,19 +89,20 @@ const AddRole = () => {
       login: data.login,
       password: md5(password),
       rolesID: selectedRoles,
-    })
-    handleOpen()
-  }
+    });
+    handleOpen();
+  };
 
   const onSubmit = async () => {
-    const { data: result } = await axios.post('/users/create', formData)
+    const { data: result } = await axios.post('/users/create', formData);
     if (!result.success) {
       console.error(result.error || result);
-      return handleClose()
+      handleClose();
+      return;
     }
 
-    router.back()
-  }
+    router.back();
+  };
 
   return <>
     <Box
@@ -111,7 +118,7 @@ const AddRole = () => {
       <form style={{ heigth: '100%' }}>
         <Grid container spacing={6} alignItems="flex-start" justifyContent='start'>
           <Grid container spacing={2} item md={6} sm={12}>
-            <Grid item xs={12} sx={{ display: 'flex', gap: 2, alignContent: "center" }}>
+            <Grid item xs={12} sx={{ display: 'flex', gap: 2, alignContent: 'center' }}>
               <Typography variant="h5">Main info</Typography>
             </Grid>
 
@@ -134,7 +141,7 @@ const AddRole = () => {
                   name="password"
                   label="Password"
                   value={password}
-                  onChange={(e) => { setPassword(e.target.value) }}
+                  onChange={(e) => { setPassword(e.target.value); }}
                   endAdornment={
                     <IconButton edge="end" onClick={() => setPassword(generateToken(12))}>
                       <Autorenew />
@@ -156,27 +163,28 @@ const AddRole = () => {
             <Divider sx={{ my: 2 }} />
 
             <Paper sx={{
-              m: 1, p: 2,
+              m: 1,
+              p: 2,
               maxHeight: '350px',
-              overflowY: 'auto'
+              overflowY: 'auto',
             }}>
               <TextField size="small" variant="outlined" fullWidth
                 label="Search" onChange={(e) => setFilterRoles(e.target.value)} />
 
               <Box sx={{
                 height: '100%',
-                overflowY: 'auto'
+                overflowY: 'auto',
               }}>
                 <List>
-                  {filterRolesList.map((el => (
-                    <ListItem disablePadding key={el._id}>
+                  {filterRolesList.map(((el) => (
+                    <ListItem disablePadding key={el.id}>
                       <ListItemButton
-                        selected={selectedRoles.includes(el._id)}
+                        selected={selectedRoles.includes(el.id)}
                         onClick={() => {
-                          if (selectedRoles.includes(el._id)) {
-                            setSelectedRoles(selectedRoles.filter(id => id !== el._id))
+                          if (selectedRoles.includes(el.id)) {
+                            setSelectedRoles(selectedRoles.filter((id) => id !== el.id));
                           } else {
-                            setSelectedRoles([...selectedRoles, el._id])
+                            setSelectedRoles([...selectedRoles, el.id]);
                           }
                         }}
                       >
@@ -206,7 +214,7 @@ const AddRole = () => {
       onCancel={handleClose}
       onSubmit={onSubmit}
     >Confirm creation?</Modal>
-  </>
-}
+  </>;
+};
 
-export default AddRole
+export default AddRole;

@@ -1,28 +1,31 @@
-import axios from '../../tools/axios';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
-import Ifraim from '../Ifraim';
+import axios from '../../tools/axios';
+import Ifraim from '../Ifraim.jsx';
 
 const Project = () => {
-  const router = useRouter()
+  const router = useRouter();
   const [project, setProject] = useState(null);
 
   const fetchProject = async (id) => {
-    const { data: result } =  await axios.post('/access/project', { id })
-    if (!result.success) return console.error(result.error || result);
+    const { data: result } = await axios.post('/access/project', { id });
+    if (!result.success) {
+      console.error(result.error || result);
+      return;
+    }
 
-    setProject(result.project)
-  }
+    setProject(result.project);
+  };
 
   useEffect(() => {
-    if (!router.query?.project) return
-    const { project: id } = router.query
-    fetchProject(id)
+    if (!router.query?.project) return;
+    const { project: id } = router.query;
+    fetchProject(id);
   }, [router]);
 
-  if (!project) return <>Loading</>
+  if (!project) return <>Loading</>;
 
-  return <Ifraim src={project.link}/>
-}
+  return <Ifraim src={project.link}/>;
+};
 
-export default Project
+export default Project;

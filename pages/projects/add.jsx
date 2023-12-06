@@ -1,18 +1,18 @@
+import React, { useState } from 'react';
 import { Autorenew, Save as SaveIcon } from '@mui/icons-material';
 import {
   Box, Button, FormControl,
   FormControlLabel,
   Grid, IconButton, InputLabel,
-  MenuItem, OutlinedInput, Switch, TextField, Typography
+  MenuItem, OutlinedInput, Switch, TextField, Typography,
 } from '@mui/material';
 
 import { useRouter } from 'next/router';
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import axios from '../../tools/axios';
 import { generateToken } from '../../tools/functions';
-import Modal from '../../components/Modal';
+import Modal from '../../components/Modal.jsx';
 
 const types = [
   {
@@ -26,11 +26,11 @@ const types = [
 ];
 
 const AddProject = () => {
-  const router = useRouter()
+  const router = useRouter();
 
-  const [open, setOpen] = useState(false)
-  const handleOpen = () => setOpen(true)
-  const handleClose = () => setOpen(false)
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   const { register, handleSubmit } = useForm({});
 
@@ -39,55 +39,57 @@ const AddProject = () => {
     {...props}
     fullWidth
     variant="outlined"
-  >{children}</TextField>
+  >{children}</TextField>;
 
+  const [token, setToken] = useState('');
+  const [type, setType] = useState(types[0].value);
+  const [formData, setFormData] = useState({});
+  const [formErrors, setFormErrors] = useState({});
+  const [noExtraTime, setNoExtraTime] = useState(false);
 
-  const [token, setToken] = useState('')
-  const [type, setType] = useState(types[0].value)
-  const [formData, setFormData] = useState({})
-  const [formErrors, setFormErrors] = useState({})
-  const [noExtraTime, setNoExtraTime] = useState(false)
+  const checkData = (d) => {
+    const data = d;
+    const errors = {};
+    setFormErrors(errors);
 
-  const checkData = (data) => {
-    const errors = {}
-    setFormErrors(errors)
+    if (!data.name) errors.name = 'Project name is require';
+    if (!type) errors.type = 'Type is require';
+    if (!data.reloadTime) errors.reloadTime = 'Reload time is require';
 
-    if (!data.name) errors.name = 'Project name is require'
-    if (!type) errors.type = 'Type is require'
-    if (!data.reloadTime) errors.reloadTime = 'Reload time is require'
-
-    if (!data.token) data.token = token || generateToken()
+    if (!data.token) data.token = token || generateToken();
 
     if (Object.keys(errors).length) {
-      setFormErrors(errors)
-      return
+      setFormErrors(errors);
+      return;
     }
 
     setFormData({
       name: data.name,
-      type: type,
+      type,
       description: data.description,
       token: data.token,
       reloadTime: data.reloadTime,
-      noExtraTime: noExtraTime,
+      noExtraTime,
       requestLink: type === 'website' ? data.requestLink : '',
       link: data.link,
       telegram: {
         chat: data.telegramChat,
-        token: data.telegramToken
-      }
-    })
-    handleOpen()
-  }
+        token: data.telegramToken,
+      },
+    });
+    handleOpen();
+  };
+
   const onSubmit = async () => {
-    const { data: result } = await axios.post('/projects/create', formData)
+    const { data: result } = await axios.post('/projects/create', formData);
     if (!result.success) {
       console.error(result.error || result);
-      return handleClose()
+      handleClose();
+      return;
     }
 
-    router.back()
-  }
+    router.back();
+  };
 
   return <>
     <Box
@@ -140,7 +142,7 @@ const AddProject = () => {
                   name="token"
                   label="Token"
                   value={token}
-                  onChange={(e) => { setToken(e.target.value) }}
+                  onChange={(e) => { setToken(e.target.value); }}
                   endAdornment={
                     <IconButton edge="end" onClick={() => setToken(generateToken())}>
                       <Autorenew />
@@ -156,13 +158,15 @@ const AddProject = () => {
             </Grid>
             <Grid item xs={2}>
               <FormControlLabel
-                control={<Switch checked={!noExtraTime} onChange={e => setNoExtraTime(!e.target.checked)} />}
+                control={<Switch
+                  checked={!noExtraTime} onChange={(e) => setNoExtraTime(!e.target.checked)}
+                />}
                 label="+10 min" />
             </Grid>
 
             {
-              type === 'website' &&
-              <Grid item xs={12}>
+              type === 'website'
+              && <Grid item xs={12}>
                 <Input name='requestLink' label="Link for request" type="text" />
               </Grid>
             }
@@ -194,7 +198,7 @@ const AddProject = () => {
       onCancel={handleClose}
       onSubmit={onSubmit}
     >Confirm creation?</Modal>
-  </>
-}
+  </>;
+};
 
-export default AddProject
+export default AddProject;

@@ -1,83 +1,96 @@
-import axios from "../../tools/axios";
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from 'react';
 import {
-  Box, Button, Checkbox, Chip, Divider, IconButton, Link, List, ListItem,
-  ListItemButton, Paper, Stack, TextField, Typography
-} from "@mui/material"
-import { Add, Delete, Edit, Replay } from "@mui/icons-material";
+  Box, Button, Chip, Divider, IconButton, Link, List, ListItem,
+  ListItemButton, Paper, Stack, TextField, Typography,
+} from '@mui/material';
+import {
+  Add, Delete, Edit,
+} from '@mui/icons-material';
+import axios from '../../tools/axios';
 
-import Modal from "../../components/Modal";
-import Role from "../../components/Role";
+import Modal from '../../components/Modal.jsx';
+import Role from '../../components/Role.jsx';
 
 const RolesPage = () => {
   const [selectedRole, setSelectedRole] = useState(null);
   const [rolesList, setRolesList] = useState([]);
   const [roleDetails, setRoleDetails] = useState();
-  
+
   const [filter, setFilter] = useState();
-  const filterList = useMemo(() => filter
-    ? rolesList.filter(({ name }) => name.toLowerCase().indexOf(filter.toLowerCase()) !== -1)
-    : rolesList
-  , [rolesList, filter])
+  const filterList = useMemo(
+    () => (filter
+      ? rolesList.filter(({ name }) => name.toLowerCase().indexOf(filter.toLowerCase()) !== -1)
+      : rolesList),
+    [rolesList, filter],
+  );
 
   const fetchRoles = async () => {
-    const { data: result } = await axios.post('/roles')
-    if (!result.success) return console.error(result.error || result);
+    const { data: result } = await axios.post('/roles');
+    if (!result.success) {
+      console.error(result.error || result);
+      return;
+    }
 
-    const { rolesList: data } = result
-    setRolesList(data)
-  }
+    const { rolesList: data } = result;
+    setRolesList(data);
+  };
   const fetchRoleDetail = async () => {
-    const { data: result } = await axios.post('/roles/getOne', { id: selectedRole })
-    if (!result.success) return console.error(result.error || result);
+    const { data: result } = await axios.post('/roles/getOne', { id: selectedRole });
+    if (!result.success) {
+      console.error(result.error || result);
+      return;
+    }
 
-    const { role } = result
-    setRoleDetails(role)
-  }
+    const { role } = result;
+    setRoleDetails(role);
+  };
   useEffect(() => {
-    if (!rolesList.length) fetchRoles()
+    if (!rolesList.length) fetchRoles();
   }, []);
   useEffect(() => {
-    if (selectedRole) fetchRoleDetail()
+    if (selectedRole) fetchRoleDetail();
   }, [selectedRole]);
 
-  const [open, setOpen] = useState(false)
-  const handleModalOpen = () => setOpen(true)
-  const handleModalClose = () => setOpen(false)
+  const [open, setOpen] = useState(false);
+  const handleModalOpen = () => setOpen(true);
+  const handleModalClose = () => setOpen(false);
 
-  const [elemOnRemove, setElemOnRemove] = useState(null)
-  const [nameForRemoval, setNameForRemoval] = useState('')
-  const [removalRole, setRemovalRole] = useState(null)
+  const [elemOnRemove, setElemOnRemove] = useState(null);
+  const [nameForRemoval, setNameForRemoval] = useState('');
+  const [removalRole, setRemovalRole] = useState(null);
 
   useEffect(() => {
     if (!open) {
-      setElemOnRemove(null)
-      setNameForRemoval('')
-      setRemovalRole(null)
+      setElemOnRemove(null);
+      setNameForRemoval('');
+      setRemovalRole(null);
     }
   }, [open]);
 
   const removeRole = (elem) => {
-    setElemOnRemove(elem)
-    handleModalOpen()
-  }
+    setElemOnRemove(elem);
+    handleModalOpen();
+  };
 
   const comfirmRemove = async () => {
     if (elemOnRemove.name !== nameForRemoval) {
-      setRemovalRole('Values don`t match')
-      return
+      setRemovalRole('Values don`t match');
+      return;
     }
 
-    const { data: result } = await axios.post('/roles/remove', { id: elemOnRemove._id })
-    if (!result.success) return console.error(result.error || result);
+    const { data: result } = await axios.post('/roles/remove', { id: elemOnRemove.id });
+    if (!result.success) {
+      console.error(result.error || result);
+      return;
+    }
 
-    fetchRoles()
+    fetchRoles();
 
-    setRoleDetails(null)
-    setSelectedRole(null)
+    setRoleDetails(null);
+    setSelectedRole(null);
 
-    handleModalClose()
-  }
+    handleModalClose();
+  };
 
   return <>
     <Box sx={{
@@ -85,32 +98,33 @@ const RolesPage = () => {
       gridTemplateColumns: '1fr 3fr',
       '@media screen and (max-width: 780px)': {
         gridTemplateColumns: '1fr',
-        gridTemplateRows: '350px auto', 
+        gridTemplateRows: '350px auto',
       },
       gap: 4,
       minHeight: '100%',
     }}>
       <Paper sx={{
-        m: 1, p: 2,
+        m: 1,
+        p: 2,
         overflow: 'hidden',
         maxHeight: 'calc(100% - 16px)',
         display: 'grid',
         gridTemplateRows: 'auto 1fr auto',
         gap: 1,
       }}>
-        <TextField size="small" variant="outlined"  fullWidth
+        <TextField size="small" variant="outlined" fullWidth
           label="Search" onChange={(e) => setFilter(e.target.value)} />
 
         <Box sx={{
           height: '100%',
-          overflowY: 'auto'
+          overflowY: 'auto',
         }}>
           <List>
-            {filterList.map((el => (
-              <ListItem disablePadding key={el._id}>
+            {filterList.map(((el) => (
+              <ListItem disablePadding key={el.id}>
                 <ListItemButton
-                  selected={selectedRole === el._id}
-                  onClick={() => setSelectedRole(el._id)}
+                  selected={selectedRole === el.id}
+                  onClick={() => setSelectedRole(el.id)}
                 >
                   <Role sx={{ fontSize: '1em' }} color={el.color}>{el.name}</Role>
                 </ListItemButton>
@@ -128,16 +142,16 @@ const RolesPage = () => {
         maxHeight: '100%',
         overflow: 'hidden',
         display: 'grid',
-        gridTemplateRows: '1fr auto'
+        gridTemplateRows: '1fr auto',
       }}>
         {roleDetails && <Box>
           <Stack direction='row' spacing={1} justifyContent='space-between'>
             <Typography variant='h5'>{roleDetails.name}</Typography>
 
             <Stack direction="row">
-              <IconButton href={`/roles/${roleDetails._id}`}><Edit /></IconButton>
-              {!roleDetails.baseRole && 
-                <IconButton onClick={() => removeRole(roleDetails)}><Delete /></IconButton>
+              <IconButton href={`/roles/${roleDetails.id}`}><Edit /></IconButton>
+              {!roleDetails.baseRole
+                && <IconButton onClick={() => removeRole(roleDetails)}><Delete /></IconButton>
               }
             </Stack>
           </Stack>
@@ -154,9 +168,7 @@ const RolesPage = () => {
             <Typography variant='subtitle1'>Dashboard blocks:</Typography>
 
             <Stack direction='row' spacing={1} sx={{ my: 1 }}>
-              {roleDetails.blocks.map(el =>
-                <Chip key={el._id} label={el.title} variant="outlined" />
-              )}
+              {roleDetails.blocks.map((el) => <Chip key={el.id} label={el.title} variant="outlined" />)}
             </Stack>
           </Box> }
 
@@ -164,11 +176,9 @@ const RolesPage = () => {
             <Typography variant='subtitle1'>Content {'[ pages ]'}:</Typography>
 
             <Stack direction='row' spacing={1} sx={{ my: 1 }}>
-              {roleDetails.content.map(el => 
-                <Link key={el._id} href={el.link} sx={{ cursor: 'pointer' }}>
+              {roleDetails.content.map((el) => <Link key={el.id} href={el.link} sx={{ cursor: 'pointer' }}>
                   <Chip label={el.title} variant="outlined" />
-                </Link>
-              )}
+                </Link>)}
             </Stack>
           </Box> }
 
@@ -176,9 +186,7 @@ const RolesPage = () => {
             <Typography variant='subtitle1'>Projects:</Typography>
 
             <Stack direction='row' spacing={1} sx={{ my: 1 }}>
-              {roleDetails.access.map(el =>
-                <Chip key={el._id} label={el.name} variant="outlined" />
-              )}
+              {roleDetails.access.map((el) => <Chip key={el.id} label={el.name} variant="outlined" />)}
             </Stack>
           </Box> }
         </Box>}
@@ -198,15 +206,15 @@ const RolesPage = () => {
         error={!!removalRole}
         helperText={removalRole}
         onChange={(e) => {
-          setNameForRemoval(e.target.value)
-          if (removalRole) setRemovalRole(null)
+          setNameForRemoval(e.target.value);
+          if (removalRole) setRemovalRole(null);
         }}
         value={nameForRemoval}
         label="Project name"
         variant="standard"
       />
     </Modal>
-  </>
-}
+  </>;
+};
 
-export default RolesPage
+export default RolesPage;

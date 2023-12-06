@@ -1,7 +1,4 @@
-import axios from '../../tools/axios';
-import { useEffect, useMemo, useState } from 'react';
-
-import Modal from '../../components/Modal';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination,
@@ -23,84 +20,97 @@ import {
   Delete,
   Replay,
 } from '@mui/icons-material';
-import CopyText from '../../components/CopyText';
+import Modal from '../../components/Modal.jsx';
+import axios from '../../tools/axios';
+import CopyText from '../../components/CopyText.jsx';
 
 const columns = [
   { id: 'status', align: 'center', style: { px: 0, width: '10px' } },
   { id: 'link', style: { px: 0, width: '5px' } },
   { id: 'name', label: 'Name', style: { fontWeight: 700 } },
-  { id: 'date', label: 'Last check time', style: { whiteSpace: 'nowrap' },
-    format: (value) => value ? new Date(value)?.toLocaleString('uk-UA') : ''},
+  {
+    id: 'date',
+    label: 'Last check time',
+    style: { whiteSpace: 'nowrap' },
+    format: (value) => (value ? new Date(value)?.toLocaleString('uk-UA') : ''),
+  },
   { id: 'errors', label: 'Errors', align: 'right' },
-  { id: 'running', label: 'Running', align: 'right', style: { width: '50px' } },
+  {
+    id: 'running', label: 'Running', align: 'right', style: { width: '50px' },
+  },
 ];
 
 const ProjectLink = ({ type, link }) => {
-  if (!type || !link) return <></>
+  if (!type || !link) return <></>;
 
-  const icon = type === 'website' ?
-    <WebAssetIcon /> :
-  type === 'telegramBot' ?
-    <SmartToyIcon /> :
-    null
+  const icon = (() => {
+    if (type === 'website') return <WebAssetIcon />;
+    if (type === 'telegramBot') return <SmartToyIcon />;
+
+    return null;
+  })();
 
   const formatLink = (str) => {
-    const split = str.split('//')
-    return split[split.length - 1].slice(0, 7) + '...'
-  }
+    const split = str.split('//');
+    return `${split[split.length - 1].slice(0, 7)}...`;
+  };
 
-  if (!icon) return <Button
+  if (!icon) {
+    return <Button
       href={link} target="_blank"
       sx={{ textTransform: 'lowercase' }}
-    >{formatLink(link)}</Button>
+    >{formatLink(link)}</Button>;
+  }
 
   return <IconButton
     href={link}
     variant="outlined"
     target="_blank"
     color="primary"
-  >{icon}</IconButton>
-}
+  >{icon}</IconButton>;
+};
 
 const Projects = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  
+
   const [data, setData] = useState([]);
   const [selectedProject, setSelectedProject] = useState(null);
   const [projectDetails, setProjectDetails] = useState();
 
-  const rows = useMemo(() => {
-    return data.map(el => ({
-      ...el,
-      id: el._id,
-      link: <ProjectLink link={el.link} type={el.type} />,
-      date: el.checkDate,
-      errors: el.errorsCount,
-    }))
-  }, [data])
+  const rows = useMemo(() => data.map((el) => ({
+    ...el,
+    id: el.id,
+    link: <ProjectLink link={el.link} type={el.type} />,
+    date: el.checkDate,
+    errors: el.errorsCount,
+  })), [data]);
 
   useEffect(() => {
-    if (!selectedProject) return
+    if (!selectedProject) return;
 
-    setProjectDetails(rows.find(el => el.id === selectedProject))
+    setProjectDetails(rows.find((el) => el.id === selectedProject));
   }, [selectedProject]);
 
   const [filter, setFilter] = useState();
-  const filterList = useMemo(() => filter
-    ? rows.filter(({ name }) =>
-      name.toLowerCase().indexOf(filter.toLowerCase()) !== -1)
-    : rows
-    , [rows, filter])
+  const filterList = useMemo(
+    () => (filter
+      ? rows.filter(({ name }) => name.toLowerCase().indexOf(filter.toLowerCase()) !== -1)
+      : rows),
+    [rows, filter],
+  );
 
   const fetchData = async () => {
-    const { data: result } = await axios.post('/projects')
-    if (!result.success) return console.error(result.error || result);
+    const { data: result } = await axios.post('/projects');
+    if (!result.success) {
+      console.error(result.error || result);
+      return;
+    }
 
-    const { projectsList } = result
-    setData(projectsList)
-  }
-  useEffect(() => { if (!data.length) fetchData() }, []);
+    const { projectsList } = result;
+    setData(projectsList);
+  };
+  useEffect(() => { if (!data.length) fetchData(); }, []);
 
   const handleChangePage = (event, newPage) => setPage(newPage);
   const handleChangeRowsPerPage = (event) => {
@@ -108,46 +118,52 @@ const Projects = () => {
     setPage(0);
   };
 
-  const [open, setOpen] = useState(false)
-  const handleModalOpen = () => setOpen(true)
-  const handleModalClose = () => setOpen(false)
+  const [open, setOpen] = useState(false);
+  const handleModalOpen = () => setOpen(true);
+  const handleModalClose = () => setOpen(false);
 
-  const [elemOnRemove, setElemOnRemove] = useState(null)
-  const [nameForRemoval, setNameForRemoval] = useState('')
-  const [removalError, setRemovalError] = useState(null)
+  const [elemOnRemove, setElemOnRemove] = useState(null);
+  const [nameForRemoval, setNameForRemoval] = useState('');
+  const [removalError, setRemovalError] = useState(null);
 
   useEffect(() => {
     if (!open) {
-      setElemOnRemove(null)
-      setNameForRemoval('')
-      setRemovalError(null)
+      setElemOnRemove(null);
+      setNameForRemoval('');
+      setRemovalError(null);
     }
   }, [open]);
 
   const removeProject = (elem) => {
-    setElemOnRemove(elem)
-    handleModalOpen()
-  }
+    setElemOnRemove(elem);
+    handleModalOpen();
+  };
 
   const comfirmRemove = async () => {
     if (elemOnRemove.name !== nameForRemoval) {
-      setRemovalError('Values don`t match')
-      return
+      setRemovalError('Values don`t match');
+      return;
     }
 
-    const { data: result } = await axios.post('/projects/remove', { id: elemOnRemove.id })
-    if (!result.success) return console.error(result.error || result);
+    const { data: result } = await axios.post('/projects/remove', { id: elemOnRemove.id });
+    if (!result.success) {
+      console.error(result.error || result);
+      return;
+    }
 
-    fetchData()
-    handleModalClose()
-  }
+    fetchData();
+    handleModalClose();
+  };
 
   const runningStatusToggle = async (id) => {
-    const { data: result } = await axios.post('/projects/switchRunningStatus', { id })
-    if (!result.success) return console.error(result.error || result);
+    const { data: result } = await axios.post('/projects/switchRunningStatus', { id });
+    if (!result.success) {
+      console.error(result.error || result);
+      return;
+    }
 
-    fetchData()
-  }
+    fetchData();
+  };
 
   return <>
     <Box sx={{
@@ -161,7 +177,8 @@ const Projects = () => {
       minHeight: '100%',
     }}>
       <Paper sx={{
-        m: 1, p: 2,
+        m: 1,
+        p: 2,
         overflow: 'hidden',
         maxHeight: 'calc(100% - 16px)',
         display: 'grid',
@@ -177,7 +194,7 @@ const Projects = () => {
           maxHeight: '100%',
           overflow: 'hidden',
           display: 'grid',
-          gridTemplateRows: '1fr auto'
+          gridTemplateRows: '1fr auto',
         }}>
 
           <TableContainer>
@@ -210,7 +227,7 @@ const Projects = () => {
                   >
                     {columns.map((column) => {
                       const value = row[column.id];
-              
+
                       if (column.id === 'status') {
                         return <TableCell key={column.id}
                           sx={{
@@ -219,18 +236,18 @@ const Projects = () => {
                             overflow: 'hidden',
                             borderRadius: '1em',
                             backgroundColor: !row?.stopped
-                              ? value ? 'var(--color-green)' : 'var(--color-red)'
+                              ? (() => (value ? 'var(--color-green)' : 'var(--color-red)'))()
                               : 'grey',
                           }}
-                        />
+                        />;
                       }
-              
+
                       if (column.id === 'running') {
                         return <TableCell key={column.id} sx={{ padding: 0, textAlign: 'center' }}>
                           <Switch key={`running-${row.id}`} defaultChecked={!row?.stopped} onChange={() => runningStatusToggle(row.id)} />
-                        </TableCell>
+                        </TableCell>;
                       }
-              
+
                       return (
                         <TableCell
                           key={column.id}
@@ -248,9 +265,9 @@ const Projects = () => {
 
           <Stack direction="row" sx={{ justifyContent: 'end', alignItems: 'center' }} >
             <Button onClick={() => {
-              setData([])
-              setPage(0)
-              fetchData()
+              setData([]);
+              setPage(0);
+              fetchData();
             }}><Replay/></Button>
 
             <Button href="/projects/add"><AddCircle/></Button>
@@ -265,7 +282,7 @@ const Projects = () => {
               onRowsPerPageChange={handleChangeRowsPerPage}
 
               sx={{
-                height: 'fit-content'
+                height: 'fit-content',
               }}
             />
           </Stack>
@@ -277,7 +294,7 @@ const Projects = () => {
         maxHeight: '100%',
         overflow: 'hidden',
         display: 'grid',
-        gridTemplateRows: '1fr auto'
+        gridTemplateRows: '1fr auto',
       }}>
         {projectDetails && <Box>
           <Stack direction='row' spacing={1} justifyContent='space-between'>
@@ -300,18 +317,17 @@ const Projects = () => {
           </>}
           <Typography variant='body2'><i>Created</i>: {new Date(projectDetails.createdAt).toLocaleString('uk-UA')}</Typography>
           <Typography variant='body2'><i>Type</i>: {projectDetails.type}</Typography>
-          
+
           <Divider sx={{ my: 2 }} />
 
           <Typography variant='subtitle1'><b>Token</b>: <CopyText>{projectDetails.token}</CopyText></Typography>
           <Typography variant='subtitle1'><b>Reload time</b>: {projectDetails.reloadTime}s</Typography>
           <Typography variant='subtitle1'><b>Last check</b>: {projectDetails.date ? new Date(projectDetails.date)?.toLocaleString('uk-UA') : 'No check'}</Typography>
           <Typography variant='subtitle1'><b>Errors</b>: {projectDetails.errors}</Typography>
-          
+
           { projectDetails.requestLink && <>
             <Typography variant='subtitle1'><b>Request link</b>: <CopyText>{projectDetails.requestLink}</CopyText></Typography>
           </>}
-
 
           { (projectDetails.telegram?.token || projectDetails.telegram?.chat) && <>
             <Divider sx={{ my: 1 }} />
@@ -337,15 +353,15 @@ const Projects = () => {
         error={!!removalError}
         helperText={removalError}
         onChange={(e) => {
-          setNameForRemoval(e.target.value)
-          if (removalError) setRemovalError(null)
+          setNameForRemoval(e.target.value);
+          if (removalError) setRemovalError(null);
         }}
         value={nameForRemoval}
         label="Project name"
         variant="standard"
       />
     </Modal>
-  </>
-}
+  </>;
+};
 
-export default Projects
+export default Projects;

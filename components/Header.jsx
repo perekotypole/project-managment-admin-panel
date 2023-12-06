@@ -1,55 +1,68 @@
-import { Avatar, Box, Button, Divider, Link, Menu, MenuItem } from '@mui/material';
-import axios from '../tools/axios';
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  Avatar, Box, Button, Divider, Link, Menu, MenuItem,
+} from '@mui/material';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo, useState } from 'react';
+import axios from '../tools/axios';
 
 const defaultNav = [
   {
     title: 'Dashboard',
-    link: '/'
+    link: '/',
   },
-]
+];
 
 const Header = ({ onlyLogout = false }) => {
-  const router = useRouter()
+  const router = useRouter();
   const [user, setUser] = useState([]);
   const [accessPages, setAccessPages] = useState([]);
   const [projectsLinks, setProjectsLinks] = useState([]);
-  
+
   const navigation = useMemo(() => [...defaultNav, ...accessPages], [accessPages]);
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  const handleClick = (event) => setAnchorEl(event.currentTarget)
-  const handleClose = () => setAnchorEl(null)
+  const handleClick = (event) => setAnchorEl(event.currentTarget);
+  const handleClose = () => setAnchorEl(null);
 
   const fetchUser = async () => {
-    const { data: result } = await axios.post('/access/user')
-    if (!result?.success) return console.error(result.error || result);
+    const { data: result } = await axios.post('/access/user');
+    if (!result?.success) {
+      console.error(result.error || result);
+      return;
+    }
 
-    setUser(result.user)
-  }
+    setUser(result.user);
+  };
 
   const getPages = async () => {
-    const { data: result } = await axios.post('/access/getPages')
-    if (!result?.success) return console.error(result.error || result);
+    const { data: result } = await axios.post('/access/getPages');
+    if (!result?.success) {
+      console.error(result.error || result);
+      return;
+    }
 
-    setAccessPages(result.pages)
-    setProjectsLinks(result.projects)
-  }
+    setAccessPages(result.pages);
+    setProjectsLinks(result.projects);
+  };
 
   useEffect(() => {
-    getPages()
-    fetchUser()
+    getPages();
+    fetchUser();
   }, []);
 
   const onLogout = async () => {
-    const { data: result } = await axios.post('/auth/logout',)
-    if (!result?.success) return console.error(result.error || result);
-    return router.push('/login');
-  }
+    const { data: result } = await axios.post('/auth/logout');
+    if (!result?.success) {
+      console.error(result.error || result);
+      return;
+    }
+    router.push('/login');
+  };
 
-  const NavLink = ({children, active, sx, ...prors}) => <Link
+  const NavLink = ({
+    children, active, sx, ...prors
+  }) => <Link
     color="inherit"
     underline="none"
     title={children}
@@ -58,7 +71,7 @@ const Header = ({ onlyLogout = false }) => {
 
     sx={{
       textAlign: 'center',
-      fontWeight: active ? 600: 'inherit',
+      fontWeight: active ? 600 : 'inherit',
       '&:hover': {
         fontWeight: 600,
       },
@@ -73,7 +86,7 @@ const Header = ({ onlyLogout = false }) => {
       },
       ...sx,
     }}
-  >{children}</Link>
+  >{children}</Link>;
 
   return <Box
     sx={{
@@ -86,7 +99,7 @@ const Header = ({ onlyLogout = false }) => {
         display: 'flex',
         minWidth: '100%',
         gap: '2vw',
-        alignItems: 'center'
+        alignItems: 'center',
       }}
     >
       {!onlyLogout && <>
@@ -111,7 +124,7 @@ const Header = ({ onlyLogout = false }) => {
 
       <Button
         sx={{
-          marginLeft: 'auto'
+          marginLeft: 'auto',
         }}
         id="basic-button"
         aria-controls={open ? 'basic-menu' : undefined}
@@ -135,7 +148,7 @@ const Header = ({ onlyLogout = false }) => {
         <MenuItem onClick={onLogout}>Logout</MenuItem>
       </Menu>
     </Box>
-  </Box>
-}
+  </Box>;
+};
 
-export default Header
+export default Header;

@@ -1,17 +1,18 @@
+import React, { useEffect, useState } from 'react';
 import { Autorenew, Save as SaveIcon } from '@mui/icons-material';
-import { Box, Button, FormControl,
+import {
+  Box, Button, FormControl,
   FormControlLabel,
   Grid, IconButton, InputLabel,
-  MenuItem, OutlinedInput, Switch, TextField, Typography
+  MenuItem, OutlinedInput, Switch, TextField, Typography,
 } from '@mui/material';
 
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import axios from '../../tools/axios';
 import { generateToken } from '../../tools/functions';
-import Modal from '../../components/Modal';
+import Modal from '../../components/Modal.jsx';
 
 const types = [
   {
@@ -25,14 +26,14 @@ const types = [
 ];
 
 const EditProject = () => {
-  const router = useRouter()
-  const { id } = router.query
+  const router = useRouter();
+  const { id } = router.query;
 
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true);
 
-  const [open, setOpen] = useState(false)
-  const handleOpen = () => setOpen(true)
-  const handleClose = () => setOpen(false)
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   const { register, handleSubmit } = useForm({});
 
@@ -41,80 +42,83 @@ const EditProject = () => {
     {...props}
     fullWidth
     variant="outlined"
-  >{children}</TextField>
+  >{children}</TextField>;
 
-  const [token, setToken] = useState('')
-  const [type, setType] = useState(types[0].value)
-  const [formData, setFormData] = useState({})
-  const [formErrors, setFormErrors] = useState({})
-  const [noExtraTime, setNoExtraTime] = useState(false)
+  const [token, setToken] = useState('');
+  const [type, setType] = useState(types[0].value);
+  const [formData, setFormData] = useState({});
+  const [formErrors, setFormErrors] = useState({});
+  const [noExtraTime, setNoExtraTime] = useState(false);
 
-  const fetchData = async (id) => {
-    const { data: result } = await axios.post('/projects/getOne', { id })
+  const fetchData = async (projectID) => {
+    const { data: result } = await axios.post('/projects/getOne', { id: projectID });
     if (!result.success) {
       console.error(result.error || result);
-      return handleClose()
+      handleClose();
+      return;
     }
 
-    const { project: data } = result
-    setFormData(data)
-    setToken(data.token)
-    setType(data.type)
-    setNoExtraTime(!!data.noExtraTime)
-  }
-  const checkData = (data) => {
-    const errors = {}
-    setFormErrors(errors)
+    const { project: data } = result;
+    setFormData(data);
+    setToken(data.token);
+    setType(data.type);
+    setNoExtraTime(!!data.noExtraTime);
+  };
+  const checkData = (d) => {
+    const data = d;
+    const errors = {};
+    setFormErrors(errors);
 
-    if (!data.name) errors.name = 'Project name is require'
-    if (!type) errors.type = 'Type is require'
-    if (!data.reloadTime) errors.reloadTime = 'Reload time is require'
+    if (!data.name) errors.name = 'Project name is require';
+    if (!type) errors.type = 'Type is require';
+    if (!data.reloadTime) errors.reloadTime = 'Reload time is require';
 
-    if (!data.token) data.token = token || generateToken()
+    if (!data.token) data.token = token || generateToken();
 
-    if (Object.keys(errors).length){
-      setFormErrors(errors)
-      return
+    if (Object.keys(errors).length) {
+      setFormErrors(errors);
+      return;
     }
 
     setFormData({
       name: data.name,
-      type: type,
+      type,
       description: data.description,
       token: data.token,
       reloadTime: data.reloadTime,
-      noExtraTime: noExtraTime,
+      noExtraTime,
       requestLink: type === 'website' ? data.requestLink : '',
       link: data.link,
       telegram: {
         chat: data.telegramChat,
-        token: data.telegramToken
-      }
-    })
-    handleOpen()
-  }
-  
+        token: data.telegramToken,
+      },
+    });
+    handleOpen();
+  };
+
   const onSubmit = async () => {
-    const { data: result } = await axios.post('/projects/edit', { id, projectData: formData })
+    const { data: result } = await axios.post('/projects/edit', { id, projectData: formData });
     if (!result.success) {
       console.error(result.error || result);
-      return handleClose()
+      handleClose();
+      return;
     }
 
-    router.back()
-  }
+    router.back();
+  };
 
   useEffect(() => {
-    if (!id) return
-    fetchData(id)
+    if (!id) return;
+    fetchData(id);
   }, [id]);
 
   useEffect(() => {
-    if (!Object.keys(formData).length) return
+    if (!Object.keys(formData).length) return;
 
-    setLoading(false)
-    setToken(formData.token)
-    setNoExtraTime(!!formData.noExtraTime)
+    setLoading(false);
+    setToken(formData.token);
+    setNoExtraTime(!!formData.noExtraTime);
   }, [formData]);
 
   return <>
@@ -127,9 +131,9 @@ const EditProject = () => {
         gridTemplateRows: '1fr auto',
         gap: 1,
       }}
-    > 
-      { !loading &&
-        <>
+    >
+      { !loading
+        && <>
           <form style={{ heigth: '100%' }}>
             <Grid container spacing={6} alignItems="flex-start" justifyContent='start'>
               <Grid container spacing={2} item md={6} sm={12}>
@@ -170,7 +174,7 @@ const EditProject = () => {
                       name="token"
                       label="Token"
                       value={token}
-                      onChange={(e) => { setToken(e.target.value) }}
+                      onChange={(e) => { setToken(e.target.value); }}
                       endAdornment={
                         <IconButton edge="end" onClick={() => setToken(generateToken())}>
                           <Autorenew />
@@ -186,13 +190,15 @@ const EditProject = () => {
                 </Grid>
                 <Grid item xs={2}>
                   <FormControlLabel
-                  control={<Switch checked={!noExtraTime} onChange={e => setNoExtraTime(!e.target.checked)} />}
+                  control={<Switch
+                    checked={!noExtraTime} onChange={(e) => setNoExtraTime(!e.target.checked)}
+                  />}
                   label="+10 min" />
                 </Grid>
 
                 {
-                  type === 'website' &&
-                  <Grid item xs={12}>
+                  type === 'website'
+                  && <Grid item xs={12}>
                     <Input name='requestLink' defaultValue={formData.requestLink} label="Link for request" type="text" />
                   </Grid>
                 }
@@ -226,7 +232,7 @@ const EditProject = () => {
       onCancel={handleClose}
       onSubmit={onSubmit}
     >Confirm changes?</Modal>
-  </>
-}
+  </>;
+};
 
-export default EditProject
+export default EditProject;

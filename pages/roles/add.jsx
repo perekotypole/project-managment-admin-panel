@@ -1,28 +1,29 @@
-import axios from '../../tools/axios';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { Save as SaveIcon } from '@mui/icons-material';
-import { Box, Button, Chip, Divider,
+import {
+  Box, Button, Chip, Divider,
   Grid,
   List,
   ListItem,
   ListItemButton,
   ListItemText,
-  Paper, TextField, Typography
+  Paper, TextField, Typography,
 } from '@mui/material';
+import axios from '../../tools/axios';
 
-import Modal from '../../components/Modal';
-import Role from '../../components/Role';
-import ColorPicker from '../../components/ColorPicker';
+import Modal from '../../components/Modal.jsx';
+import Role from '../../components/Role.jsx';
+import ColorPicker from '../../components/ColorPicker.jsx';
 
 const AddRole = () => {
-  const router = useRouter()
+  const router = useRouter();
 
-  const [open, setOpen] = useState(false)
-  const handleOpen = () => setOpen(true)
-  const handleClose = () => setOpen(false)
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   const { register, handleSubmit } = useForm({});
 
@@ -31,12 +32,12 @@ const AddRole = () => {
     {...register(props.name)}
     fullWidth
     variant="outlined"
-  >{children}</TextField>
+  >{children}</TextField>;
 
-  const [formData, setFormData] = useState({})
+  const [formData, setFormData] = useState({});
   const [roleName, setRoleName] = useState('');
-  const [color, setColor] = useState("#000000");
-  const [formErrors, setFormErrors] = useState({})
+  const [color, setColor] = useState('#000000');
+  const [formErrors, setFormErrors] = useState({});
 
   const [projectsList, setProjectsList] = useState([]);
   const [selectedProjects, setSelectedProjects] = useState([]);
@@ -47,41 +48,47 @@ const AddRole = () => {
 
   const [filterProjects, setFilter] = useState();
 
-  const filterProjectsList = useMemo(() => filterProjects
-    ? projectsList.filter(({ name }) =>
-      name.toLowerCase().indexOf(filterProjects.toLowerCase()) !== -1)
-    : projectsList
-  , [projectsList, filterProjects])
+  const filterProjectsList = useMemo(
+    () => (filterProjects
+      ? projectsList
+        .filter(({ name }) => name.toLowerCase().indexOf(filterProjects.toLowerCase()) !== -1)
+      : projectsList),
+    [projectsList, filterProjects],
+  );
 
   const fetchData = async () => {
-    const { data: result } = await axios.post('/roles/getAllContent')
-    if (!result.success) return console.error(result.error || result);
+    const { data: result } = await axios.post('/roles/getAllContent');
+    if (!result.success) {
+      console.error(result.error || result);
+      return;
+    }
 
-    const { projects, blocks, pages } = result
-    setProjectsList(projects)
-    setPagesList(pages)
-    setBlocksList(blocks)
-  }
+    const { projects, blocks, pages } = result;
+    setProjectsList(projects);
+    setPagesList(pages);
+    setBlocksList(blocks);
+  };
 
   useEffect(() => {
     if (!projectsList.length
       || !pagesList.length
       || !blocksList.length
-    ) fetchData()
+    ) fetchData();
   }, []);
 
-  const checkData = (data) => {
-    const errors = {}
-    setFormErrors(errors)
+  const checkData = (d) => {
+    const data = d;
+    const errors = {};
+    setFormErrors(errors);
 
-    data.name = roleName
-    data.color = color
+    data.name = roleName;
+    data.color = color;
 
-    if (!data.name) errors.name = 'Role name is required'
+    if (!data.name) errors.name = 'Role name is required';
 
-    if (Object.keys(errors).length){
-      setFormErrors(errors)
-      return
+    if (Object.keys(errors).length) {
+      setFormErrors(errors);
+      return;
     }
 
     setFormData({
@@ -91,19 +98,20 @@ const AddRole = () => {
       blocks: selectedBlocks,
       content: selectedPages,
       access: selectedProjects,
-    })
-    handleOpen()
-  }
-  
+    });
+    handleOpen();
+  };
+
   const onSubmit = async () => {
-    const { data: result } = await axios.post('/roles/create', formData)
+    const { data: result } = await axios.post('/roles/create', formData);
     if (!result.success) {
       console.error(result.error || result);
-      return handleClose()
+      handleClose();
+      return;
     }
 
-    router.back()
-  }
+    router.back();
+  };
 
   return <>
     <Box
@@ -115,11 +123,11 @@ const AddRole = () => {
         gridTemplateRows: '1fr auto',
         gap: 1,
       }}
-    > 
+    >
       <form style={{ heigth: '100%' }}>
         <Grid container spacing={6} alignItems="flex-start" justifyContent='start'>
           <Grid container spacing={2} item md={6} sm={12}>
-            <Grid item xs={12} sx={{ display: 'flex', gap: 2, alignContent: "center" }}>
+            <Grid item xs={12} sx={{ display: 'flex', gap: 2, alignContent: 'center' }}>
               <Typography variant="h5">Main info</Typography>
               {!!roleName && <Role color={color}>{roleName}</Role>}
             </Grid>
@@ -130,7 +138,7 @@ const AddRole = () => {
                 label="Project name"
                 fullWidth
                 value={roleName}
-                onChange={(e) => { setRoleName(e.target.value) }}
+                onChange={(e) => { setRoleName(e.target.value); }}
                 error={formErrors.name}
                 helperText={formErrors.name}
               />
@@ -152,22 +160,23 @@ const AddRole = () => {
             {!!blocksList.length && <>
               <Typography variant="h6" sx={{ mt: 2 }}>Dashboard Blocks</Typography>
               <Paper sx={{
-                m: 1, p: 2,
+                m: 1,
+                p: 2,
                 maxHeight: '250px',
-                overflowY: 'auto'
+                overflowY: 'auto',
               }}>
                 <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                  {blocksList.map((el => (
+                  {blocksList.map(((el) => (
                     <Chip
-                      key={el._id}
+                      key={el.id}
                       label={el.title}
                       color={'primary'}
-                      variant={selectedBlocks.includes(el._id) ? "filled" : "outlined"}
+                      variant={selectedBlocks.includes(el.id) ? 'filled' : 'outlined'}
                       onClick={() => {
-                        if (selectedBlocks.includes(el._id)) {
-                          setSelectedBlocks(selectedBlocks.filter(id => id !== el._id))
+                        if (selectedBlocks.includes(el.id)) {
+                          setSelectedBlocks(selectedBlocks.filter((id) => id !== el.id));
                         } else {
-                          setSelectedBlocks([...selectedBlocks, el._id])
+                          setSelectedBlocks([...selectedBlocks, el.id]);
                         }
                       }}
                     />
@@ -179,22 +188,23 @@ const AddRole = () => {
             {!!pagesList.length && <>
               <Typography variant="h6" sx={{ mt: 2 }}>Default Pages</Typography>
               <Paper sx={{
-                m: 1, p: 2,
+                m: 1,
+                p: 2,
                 maxHeight: '250px',
-                overflowY: 'auto'
+                overflowY: 'auto',
               }}>
                 <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                  {pagesList.map((el => (
+                  {pagesList.map(((el) => (
                     <Chip
-                      key={el._id}
+                      key={el.id}
                       label={el.title}
                       color={'primary'}
-                      variant={selectedPages.includes(el._id) ? "filled" : "outlined"}
+                      variant={selectedPages.includes(el.id) ? 'filled' : 'outlined'}
                       onClick={() => {
-                        if (selectedPages.includes(el._id)) {
-                          setSelectedPages(selectedPages.filter(id => id !== el._id))
+                        if (selectedPages.includes(el.id)) {
+                          setSelectedPages(selectedPages.filter((id) => id !== el.id));
                         } else {
-                          setSelectedPages([...selectedPages, el._id])
+                          setSelectedPages([...selectedPages, el.id]);
                         }
                       }}
                     />
@@ -206,9 +216,10 @@ const AddRole = () => {
             {!!projectsList.length && <>
               <Typography variant="h6" sx={{ mt: 2 }}>Projects</Typography>
               <Paper sx={{
-                m: 1, p: 2,
+                m: 1,
+                p: 2,
                 maxHeight: '350px',
-                overflowY: 'auto'
+                overflowY: 'auto',
               }}>
                 <List >
                   <ListItem>
@@ -216,15 +227,15 @@ const AddRole = () => {
                       label="Search" onChange={(e) => setFilter(e.target.value)} />
                   </ListItem>
 
-                  {filterProjectsList.map((el => (
-                    <ListItem disablePadding key={el._id}>
+                  {filterProjectsList.map(((el) => (
+                    <ListItem disablePadding key={el.id}>
                       <ListItemButton
-                        selected={selectedProjects.includes(el._id)}
+                        selected={selectedProjects.includes(el.id)}
                         onClick={() => {
-                          if (selectedProjects.includes(el._id)) {
-                            setSelectedProjects(selectedProjects.filter(id => id !== el._id))
+                          if (selectedProjects.includes(el.id)) {
+                            setSelectedProjects(selectedProjects.filter((id) => id !== el.id));
                           } else {
-                            setSelectedProjects([...selectedProjects, el._id])
+                            setSelectedProjects([...selectedProjects, el.id]);
                           }
                         }}
                       >
@@ -254,7 +265,7 @@ const AddRole = () => {
       onCancel={handleClose}
       onSubmit={onSubmit}
     >Confirm creation?</Modal>
-  </>
-}
+  </>;
+};
 
-export default AddRole
+export default AddRole;

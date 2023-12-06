@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 
-import axios from '../../tools/axios';
 import { TextField, Button, Box } from '@mui/material';
 import md5 from 'md5';
+import axios from '../../tools/axios';
 
 const Login = () => {
   const router = useRouter();
@@ -12,18 +12,20 @@ const Login = () => {
   const { register, handleSubmit, formState } = useForm({});
 
   const onSubmit = async ({ login, password }) => {
-    if (!login || !password) return setError({
-      login: !login ? 'Login is required' : null,
-      password: !password ? 'Password is required' : null,
-    })
-    
-    setError({})
+    if (!login || !password) {
+      return setError({
+        login: !login ? 'Login is required' : null,
+        password: !password ? 'Password is required' : null,
+      });
+    }
 
-    const { data: result } = await axios.post('/auth/login', { login, password: md5(password) })
+    setError({});
+
+    const { data: result } = await axios.post('/auth/login', { login, password: md5(password) });
     if (result?.success) return router.reload();
 
-    return setError(result?.error || { global: 'Unknown error' })
-  }
+    return setError(result?.error || { global: 'Unknown error' });
+  };
 
   return <Box
     sx={{
@@ -80,7 +82,7 @@ const Login = () => {
         Login
       </Button>
     </form>
-  </Box>
-}
+  </Box>;
+};
 
-export default Login
+export default Login;

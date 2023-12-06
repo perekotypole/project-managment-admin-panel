@@ -1,12 +1,12 @@
-import { useMemo } from "react";
-import Resources from "../dashboardBlocks/Resources";
+import React, { useMemo } from 'react';
+import Resources from '../dashboardBlocks/Resources.jsx';
 
 const Dashboard = ({ data }) => {
-  const slugs = useMemo(() => data.map(el => el.slug), [data])
+  const slugs = useMemo(() => data.map((el) => el.slug), [data]);
 
-  if (slugs?.includes('resources')) return <Resources />
+  if (slugs?.includes('resources')) return <Resources />;
 
-  return <></>
-}
+  return <></>;
+};
 
-export default Dashboard
+export default Dashboard;

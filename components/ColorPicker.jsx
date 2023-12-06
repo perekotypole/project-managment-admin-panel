@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { HexColorInput, HexColorPicker } from "react-colorful";
-import { Paper, Box } from "@mui/material";
+import React, { useState } from 'react';
+import { HexColorInput, HexColorPicker } from 'react-colorful';
+import { Paper, Box } from '@mui/material';
 
 const ColorPicker = ({ color, setColor }) => {
   const [open, setOpen] = useState(false);
@@ -8,10 +8,11 @@ const ColorPicker = ({ color, setColor }) => {
   return <Box
     sx={{
       position: 'relative',
-      width: '100%', height: '100%'
+      width: '100%',
+      height: '100%',
     }}
-    onFocus={() => { setOpen(true) }}
-    onBlur={() => { setOpen(false) }}
+    onFocus={() => { setOpen(true); }}
+    onBlur={() => { setOpen(false); }}
   >
     <HexColorInput color={color} onChange={setColor} prefixed style={{
       height: '100%',
@@ -36,7 +37,7 @@ const ColorPicker = ({ color, setColor }) => {
         onChange={setColor}
       />
     </Paper>
-  </Box>
-}
+  </Box>;
+};
 
-export default ColorPicker
+export default ColorPicker;
