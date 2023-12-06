@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import {
   Project, Role, Session, User,
-} from './models/index';
-import { generateToken } from './helpers/index';
-import { verifyUser } from './middleware/index';
+} from './models/index.js';
+import { generateToken } from './helpers/index.js';
+import { verifyUser } from './middleware/index.js';
 
 const router = Router();
 

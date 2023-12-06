@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { Error, Project } from './models/index';
-import { dataAccess } from './middleware/index';
-import { checkerAddProject, checkerRemoveProject } from './checker';
+import { Error, Project } from './models/index.js';
+import { dataAccess } from './middleware/index.js';
+import { checkerAddProject, checkerRemoveProject } from './checker.js';
 
 const router = Router();
 const accessSlug = 'projects';

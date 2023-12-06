@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { Content, Project, User } from './models/index';
-import { dataAccess } from './middleware/index';
+import { Content, Project, User } from './models/index.js';
+import { dataAccess } from './middleware/index.js';
 
 const router = Router();
 

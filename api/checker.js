@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Router } from 'express';
-import { sendMessage } from './helpers/telegram';
-import { Error, Project } from './models/index';
+import { sendMessage } from './helpers/telegram.js';
+import { Error, Project } from './models/index.js';
 
 const router = Router();
 

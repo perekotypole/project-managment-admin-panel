@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import {
   Project, Role, User,
-} from './models/index';
-import { dataAccess } from './middleware/index';
+} from './models/index.js';
+import { dataAccess } from './middleware/index.js';
 
 const router = Router();
 const accessSlug = 'users';

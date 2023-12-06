@@ -2,11 +2,11 @@ import * as dotenv from 'dotenv';
 
 import jwt from 'jsonwebtoken';
 import querystring from 'querystring';
-import { existPaths } from '../../initData';
-import { mainPageRedirect, paramsIsEqual, refresh } from '../helpers/index';
+import { existPaths } from '../../initData.js';
+import { mainPageRedirect, paramsIsEqual, refresh } from '../helpers/index.js';
 import {
   User, Content, Role, Project,
-} from '../models/index';
+} from '../models/index.js';
 
 dotenv.config();
 

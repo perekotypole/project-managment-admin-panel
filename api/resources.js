@@ -3,9 +3,9 @@ import checkDiskSpace from 'check-disk-space';
 import cron from 'node-cron';
 
 import { Router } from 'express';
-import { Resources } from './models/index';
-import { dataAccess } from './middleware/index';
-import { formatBytes, getCPUUsage, getNetworkSpead } from './helpers/resources';
+import { Resources } from './models/index.js';
+import { dataAccess } from './middleware/index.js';
+import { formatBytes, getCPUUsage, getNetworkSpead } from './helpers/resources.js';
 
 const router = Router();
 const accessSlug = 'resources';

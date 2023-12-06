@@ -8,11 +8,11 @@ import {
   contentBlocks,
   contentPage,
   admin,
-} from '../../initData';
+} from '../../initData.js';
 
 import {
   User, Content, Session, Role,
-} from '../models/index';
+} from '../models/index.js';
 
 dotenv.config();
 

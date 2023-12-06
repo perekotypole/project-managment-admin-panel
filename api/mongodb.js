@@ -3,7 +3,7 @@ import * as dotenv from 'dotenv';
 import { Router } from 'express';
 import { MongoClient } from 'mongodb';
 import ip from 'ip';
-import { dataAccess } from './middleware/index';
+import { dataAccess } from './middleware/index.js';
 
 dotenv.config();
 

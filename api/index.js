@@ -1,15 +1,15 @@
 import { Router } from 'express';
-import auth from './auth';
-import access from './access';
-import projects from './projects';
-import roles from './roles';
-import users from './users';
-import checker from './checker';
-import resources from './resources';
-import mongodb from './mongodb';
+import auth from './auth.js';
+import access from './access.js';
+import projects from './projects.js';
+import roles from './roles.js';
+import users from './users.js';
+import checker from './checker.js';
+import resources from './resources.js';
+import mongodb from './mongodb.js';
 
-import { verifyUser } from './middleware/index';
-import { sendMessage } from './helpers/telegram';
+import { verifyUser } from './middleware/index.js';
+import { sendMessage } from './helpers/telegram.js';
 
 process.on('uncaughtException', (err) => {
   console.error('Critical error:');

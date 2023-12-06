@@ -7,10 +7,10 @@ import session from 'express-session';
 import MongoStore from 'connect-mongo';
 import bodyParser from 'body-parser';
 
-import api from './api/index';
-import { checkInitData, database } from './api/helpers/index';
-import { verifyUser, pageAccess } from './api/middleware/index';
-import { initTimers } from './api/checker';
+import api from './api/index.js';
+import { checkInitData, database } from './api/helpers/index.js';
+import { verifyUser, pageAccess } from './api/middleware/index.js';
+import { initTimers } from './api/checker.js';
 
 dotenv.config();
 
