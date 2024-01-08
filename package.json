@@ -42,7 +42,8 @@
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.39.4",
     "recharts": "^2.3.2",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.0",
+    "winston": "^3.11.0"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.23.3",
